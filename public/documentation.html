@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>AltOffx Galaxy Documentation</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="https://files.catbox.moe/98xfvt.jpg">
+</head>
+<body class="galaxy">
+
+  <div class="doc-box">
+    <h1>👋 Welcome AltOffx!</h1>
+    <p>Selamat datang di halaman dokumentasi Galaxy API</p>
+
+    <!-- Tombol Instagram -->
+    <a href="https://www.instagram.com/altoffc" target="_blank" class="btn-instagram">
+      <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram" width="24"> Follow on Instagram
+    </a>
+
+    <!-- Tombol Login → langsung ke /login -->
+    <button id="Login">Login</button>
+  </div>
+
+  <!-- Meteor container -->
+  <div id="meteor-container"></div>
+
+  <!-- JS -->
+  <script src="meteor.js"></script>
+  <script>
+    // Tombol Login langsung redirect
+    const btn = document.getElementById('Login');
+    btn.addEventListener('click', () => {
+      window.location.href = '/login'; // pastikan di script server ada GET /login
+    });
+  </script>
+</body>
+</html>
+

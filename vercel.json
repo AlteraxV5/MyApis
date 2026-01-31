@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "script.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["src/config.json", "visitors.json", "public/**"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "script.js"
+    }
+  ]
+}
+
