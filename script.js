@@ -15,7 +15,6 @@ const cors = require('cors');
 const PORT = 3000;
 const REAL = 2460;
 const VPS_IP = '48.193.47.89';
-const DOCUMENT = 'documentation';
 
 const configNya = [
     path.join(__dirname, 'src', 'config.json'),
@@ -65,17 +64,6 @@ const incrementVisitor = () => {
     console.error('[✗] Error incrementing visitor:', error);
   }
 };
-
-const nets = os.networkInterfaces();
-let localIP = 'localhost';
-
-for (const name of Object.keys(nets)) {
-  for (const net of nets[name]) {
-    if (net.family === 'IPv4' && !net.internal) {
-      localIP = net.address;
-    }
-  }
-}
 
 /* ===============================
    STATIC FILES (HTML/CSS/JS)
@@ -195,54 +183,6 @@ app.get('/config', (req, res) => {
 ================================= */
 
 /* ===============================
-   ROOT → LOGIN
-================================= */
-app.get('/', (req, res) => {
-  incrementVisitor();
-  res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
-});
-
-// GET /login → kirim login.html
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'public', 'login.html'));
-});
-
-// Data user (database)
-const users = [
-  { username: 'admin211', password: 'Cvortex' },
-  { username: 'AltOffx211', password: 'AltOffx' }
-];
-
-// POST /login → autentikasi user
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-
-  const user = users.find(
-    u => u.username === username && u.password === password
-  );
-
-  if (user) {
-    res.redirect('/index');
-  } else {
-    res.redirect('/login');
-  }
-});
-
-/* ===============================
-   DOCUMENTATION HTML
-================================= */
-// Ubah /documentation redirect ke documentation.html
-app.get('/documentation', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'documentation.html'));
-});
-
-
-// POST /documentation ke login.html
-app.post('/documentation', (req, res) => {
-  res.redirect('/login');
-});
-
-/* ===============================
    RESTAPI HTML
 ================================= */
 // Endpoint API (GET /api)
@@ -251,11 +191,6 @@ app.post('/documentation', (req, res) => {
 // Endpoint API (POST /api)
 app.post('/donasi', (req, res) => {
   res.redirect('/donasi')
-});
-
-// Halaman index.html
-app.get('/index', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.get('/docs', (req, res) => {
@@ -299,9 +234,14 @@ initAutoLoad(app, config, configPath);
 app.listen(PORT, '0.0.0.0', () => {
   console.log('\n🚀 Server berhasil jalan!');
   console.log('----------------------------------');
-  console.log(`Login Page : https://altoffx-backend-dev.com`);
-  console.log(`Documentation : http://${VPS_IP}:${REAL}/documentation`);
-  console.log('Server running on http://localhost:3000');
-  console.log(`QRIS Configured: ${isStaticQrisConfigured() ? 'Yes' : 'No'}`);
+  console.log('RestApi: https://altoffx-myapi.vercel.app');
+  console.log('Documentation: https://altoffx-backend-dev.vercel.app');
+  console.log('Server running on http://localhost:3000/docs');
+  try {
+    console.log(`QRIS Configured: ${isStaticQrisConfigured() ? 'Yes' : 'No'}`);
+  } catch(e) {
+    console.log('QRIS Configured: Unknown');
+  }
   console.log('----------------------------------');
 });
+

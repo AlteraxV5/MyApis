@@ -2,7 +2,7 @@
   "settings": {
     "creator": "AltOffx",
     "apiName": "RestApi",
-    "description": "A free and reliable API service designed for modern application development. Built with Node.js and CommonJS, delivering fast performance, stable endpoints, and easy integration.",
+    "description": "A free and reliable API service designed for modern application development. Built with Node.js, Express, And CommonJS, delivering fast performance, stable endpoints, and easy integration.",
     "apiVersion": "v2.0",
     "visitors": "0",
     "favicon": "/src/AltOffc.png",
@@ -13,8 +13,8 @@
   "tags": {
     "ai": [
       {
-        "name": "Kuroneko Chat",
-        "endpoint": "/api/ai/AltOfficial",
+        "name": "AltOfficial Chat",
+        "endpoint": "/api/ai/altofficial",
         "filename": "AltOfficial",
         "method": "GET",
         "params": [
@@ -27,6 +27,29 @@
             "name": "session",
             "required": false,
             "description": "Session ID"
+          }
+        ]
+      },
+      {
+        "name": "NanoBanana Pro",
+        "endpoint": "/api/ai/nanobanana",
+        "filename": "NanoBananaPro",
+        "method": "POST",
+        "params": [
+          {
+            "name": "imagePath",
+            "required": true,
+            "description": "Image Path or URL"
+          },
+          {
+            "name": "prompt",
+            "required": true,
+            "description": "Question / Prompt"
+          },
+          {
+            "name": "apiKey",
+            "required": true,
+            "description": "NanoBanana Pro API Key (3rd Party)"
           }
         ]
       }
@@ -56,7 +79,7 @@
       }
     ],
     "tools": [
-       {
+      {
         "name": "Screenshot Web",
         "endpoint": "/api/tools/ssweb",
         "filename": "ssweb",
@@ -74,7 +97,7 @@
           }
         ]
       },
-       {
+      {
         "name": "Short URL",
         "endpoint": "/api/tools/shorturl",
         "filename": "shorturl",
@@ -190,4 +213,3 @@
     ]
   }
 }
-
