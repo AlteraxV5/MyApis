@@ -5,15 +5,19 @@
       "src": "script.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["src/config.json", "visitors.json", "public/**"]
+        "includeFiles": [
+          "src/config.json",
+          "src/apiKeys.json",
+          "src/reminder.json",
+          "public/**"
+        ]
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "script.js"
+      "source": "/(.*)",
+      "destination": "/script.js"
     }
   ]
 }
-
