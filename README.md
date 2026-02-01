@@ -41,4 +41,4 @@ Fitur	Deskripsi
 
 Runtime: Node.js hanya bisa menjalankan JavaScript, bukan TypeScript secara langsung.
 Performance: Kode yang dikompilasi lebih optimal untuk production.
-Deploy: Folder ini yang akan dijalankan di server. Perbandingan Mode | Mode | Command | Folder | Keterangan | |---|---|---|---| | Development | npm run dev | Memory | Langsung jalankan TS dengan ts-node (Hot Reload). | | Production | npm run build + npm start | dist/ | Kompilasi TS ke JS dulu, lalu jalankan file JS. | 🛠️ Installation & Running Pastikan kamu sudah menginstall Node.js (versi 18 atau lebih baru).
+Deploy: Folder ini yang akan dijalankan di server. Perbandingan Mode | Mode | Command | Folder | Keterangan | |---|---|---|---| | Development | npm run dev | Memory | Langsung jalankan TS dengan ts-node (Hot Reload). | | Production | npm run build + npm start | dist/ | Kompilasi TS ke JS dulu, lalu jalankan file JS. | 🛠️ Installation & Running Pastikan kamu sudah menginstall Node.js (versi 18 atau lebih baru).// Restart trigger Sun Feb  1 00:32:33 UTC 2026
