@@ -144,6 +144,19 @@
         ]
       },
       {
+        "name": "Threads Downloader",
+        "endpoint": "/api/download/threadsdl",
+        "filename": "Thdl",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Threads URL"
+          }
+        ]
+      },
+      {
         "name": "Instagram Downloader",
         "endpoint": "/api/download/instagram",
         "filename": "instagram",
