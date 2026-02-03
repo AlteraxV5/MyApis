@@ -61,38 +61,3 @@ async function threadsdl(url) {
     media
   }
 }
-
-threadsdl('https://threads.com/@zenpavtx_/post/DNOAJ6qThSD')
-.then(console.log)
-.catch(console.error)
-/*
-Output
-  author: {                                                                     username: 'zenpavtx_',
-    avatar: 'https://sssthreads.net/cover?url=xxx%3D%3D',
-    caption: 'Kewer kewer loh yaa😂\n' +
-      'Duo klepon❤️\n' +                                                           '-\n' +
-      '-\n' +
-      '-\n' +
-      '-\n' +
-      'Game:Blue archive \n' +
-      'Character: Tachibana Nozomi and Hikari\n' +
-      '-\n' +
-      '-\n' +
-      '-\n' +
-      '-\n' +                                                                     '-\n' +
-      'Tags\n' +
-      '#bluearchiveindonesia #blueachive #bluearchivejp #blueaechiveglobal #higlandershchool #ブルーアーカイブ #animeedits #alightmotionedits #edit'
-  },
-  media: [
-    {
-      type: 'video',
-      thumbnail: 'https://sssthreads.net/cover?url=xx%3D',                                                               download: 'https://sssthreads.net/download?url=xx&filename=sssthreads.net_zenpavtx__video_1769787070.mp4',                                        mp3: 'https://sssthreads.net/download?url=xx&filename=sssthreads.net_zenpavtx__video_1769787070.mp4&type=mp3'
-    },
-    {                                                                             type: 'image',
-      thumbnail: 'https://sssthreads.net/cover?url=x%3D',
-      download: 'https://sssthreads.net/download?url=x%3D&filename=sssthreads.net_zenpavtx__image_1769787070.jpg',
-      mp3: null                                                                 
-   }
-  ]
-}
-*/
