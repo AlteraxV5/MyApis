@@ -98,19 +98,6 @@
         ]
       },
       {
-        "name": "TikTok Like",
-        "endpoint": "/api/tools/ttlikes",
-        "filename": "TtLike",
-        "method": "GET",
-        "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Tiktok Likes"
-          },
-        ]
-      },
-      {
         "name": "Short URL",
         "endpoint": "/api/tools/shorturl",
         "filename": "shorturl",
