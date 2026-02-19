@@ -181,6 +181,19 @@
             "description": "TikTok URL"
           }
         ]
+      },
+      {
+        "name": "Play Downloader",
+        "endpoint": "/api/search/play",
+        "filename": "play",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Query"
+          }
+        ]
       }
     ],
     "search": [
