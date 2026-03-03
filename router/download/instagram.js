@@ -1,5 +1,24 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const CryptoJS = require('crypto-js');
+const querystring = require('querystring');
+
+const headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+    'Accept': '*/*',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    'Origin': 'https://reelsvideo.io',
+    'Referer': 'https://reelsvideo.io/',
+    'X-Requested-With': 'XMLHttpRequest'
+};
+
+function generateTS() {
+    return Math.floor(Date.now() / 1000);
+}
+
+function generateTT(ts) {
+    return CryptoJS.MD5(ts + 'X-Fc-Pp-Ty-eZ').toString();
+}
 
 module.exports = async function instagramHandler(req, res) {
     const url = req.query?.url || req.body?.url;
@@ -12,56 +31,61 @@ module.exports = async function instagramHandler(req, res) {
     }
 
     try {
-        const data = new URLSearchParams();
-        data.append('url', url);
-        data.append('v', '3');
-        data.append('lang', 'en');
+        const ts = generateTS();
+        const tt = generateTT(ts);
 
-        const config = {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Android 10; Mobile; rv:131.0) Gecko/131.0 Firefox/131.0',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'accept-language': 'id-ID',
-                'referer': 'https://downloadgram.org/',
-                'origin': 'https://downloadgram.org',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-site',
-                'priority': 'u=0',
-                'te': 'trailers'
+        const body = querystring.stringify({
+            id: url,
+            locale: 'en',
+            tt,
+            ts
+        });
+
+        const response = await axios.post(
+            'https://reelsvideo.io/reel/',
+            body,
+            {
+                headers,
+                timeout: 15000
             }
-        };
+        );
 
-        const response = await axios.post('https://api.downloadgram.org/media', data, config);
         const $ = cheerio.load(response.data);
 
-        let result = {};
+        const username = $('.bg-white span.text-400-16-18')
+            .first()
+            .text()
+            .trim() || null;
 
-        if ($('video').length) {
-            result.type = 'video';
-            result.url = $('video source').attr('src');
-            result.download_url = $('a[download]').attr('href');
-            result.thumbnail = $('video').attr('poster');
-        } else if ($('img').length) {
-            result.type = 'image';
-            result.url = $('img').attr('src');
-            result.download_url = $('a[download]').attr('href');
-        } else {
-            throw new Error("Media tidak ditemukan. Pastikan akun tidak diprivate.");
-        }
+        const videos = [];
+        $('a.type_videos').each((_, el) => {
+            const href = $(el).attr('href');
+            if (href) videos.push(href);
+        });
 
-        for (let key in result) {
-            if (Object.prototype.hasOwnProperty.call(result, key) && result[key]) {
-                result[key] = result[key].replace(/\\\\"/g, '').replace(/\\"/g, '');
-            }
+        const images = [];
+        $('a.type_images').each((_, el) => {
+            const href = $(el).attr('href');
+            if (href) images.push(href);
+        });
+
+        if (!videos.length && !images.length) {
+            throw new Error('Media tidak ditemukan. Pastikan link valid dan tidak private.');
         }
 
         res.json({
             status: true,
-            result: result
+            result: {
+                username,
+                videos,
+                images
+            }
         });
 
     } catch (error) {
-        res.status(500).json({ status: false, message: error.message });
+        res.status(500).json({
+            status: false,
+            message: error.message
+        });
     }
 };
