@@ -1,4 +1,3 @@
-gw mau struktur nya lengkap kaya gini
 const axios = require('axios');
 const cheerio = require('cheerio');
 const CryptoJS = require('crypto-js');
