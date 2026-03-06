@@ -2,8 +2,8 @@ const axios = require('axios');
 
 const gB = Buffer.from('ZXBzaWxvbmNsb3VkLm9yZw==', 'base64').toString();
 const headers = {
-  origin: 'https://ytmp3.ai',
-  referer: 'https://ytmp3.ai/',
+  origin: 'https://ytmp3.gz',
+  referer: 'https://ytmp3.gz/',
   'user-agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
   accept: '*/*'
 };
@@ -14,7 +14,7 @@ const ts = () => Math.floor(Date.now() / 1000);
 
 async function getjson() {
   if (json) return json;
-  const get = await axios.get('https://ytmp3.ai');
+  const get = await axios.get('https://ytmp3.gz');
   const html = get.data;
   const m = /var json = JSON\.parse\('([^']+)'\)/.exec(html);
   if (!m) throw new Error('Gagal ambil json ytmp3.ai');
