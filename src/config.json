@@ -144,6 +144,24 @@
         ]
       },
       {
+        "name": "Youtube Downloader Mp3/Mp4",
+        "endpoint": "/api/download/ytdl",
+        "filename": "ytdl",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Youtube URL"
+          },
+          {
+            "name": "type",
+            "required": false,
+            "description": "mp3 | mp4"
+          }
+        ]
+      },
+      {
         "name": "Threads Downloader",
         "endpoint": "/api/download/threadsdl",
         "filename": "Thdl",
