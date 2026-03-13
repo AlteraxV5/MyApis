@@ -1,12 +1,12 @@
 {
   "name": "AltOffx",
-  "version": "1.0.0",
+  "version": "3.5.0",
   "description": "",
   "main": "script.js",
   "scripts": {
     "clean": "rm -rf package-lock.json",
     "prebuild": "npm run clean",
-    "start": "node script.js"
+    "start": "-"
   },
   "author": "AltOffx ( Development )",
   "license": "ISC",
