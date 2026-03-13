@@ -1,0 +1,259 @@
+{
+  "settings": {
+    "creator": "AltOffx",
+    "apiName": "RestApi",
+    "description": "A free and reliable API service designed for modern application development. Built with Node.js, Express, And CommonJS, delivering fast performance, stable endpoints, and easy integration.",
+    "apiVersion": "v2.0",
+    "visitors": "0",
+    "favicon": "/src/AltOffc.png",
+    "thumbnail": "/src/thumbnail.jpg",
+    "channelUrl": "https://instagram.com/altoffc",
+    "github": "https://github.com/AlteraxV5"
+  },
+  "tags": {
+    "ai": [
+      {
+        "name": "AltOfficial Chat",
+        "endpoint": "/api/ai/altofficial",
+        "filename": "AltOfficial",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Question"
+          },
+          {
+            "name": "session",
+            "required": false,
+            "description": "Session ID"
+          }
+        ]
+      },
+      {
+        "name": "NanoBanana Pro",
+        "endpoint": "/api/ai/nanobanana",
+        "filename": "NanoBananaPro",
+        "method": "POST",
+        "params": [
+          {
+            "name": "imagePath",
+            "required": true,
+            "description": "Image Path or URL"
+          },
+          {
+            "name": "prompt",
+            "required": true,
+            "description": "Question / Prompt"
+          },
+          {
+            "name": "apiKey",
+            "required": true,
+            "description": "NanoBanana Pro API Key (3rd Party)"
+          }
+        ]
+      }
+    ],
+    "maker": [
+      {
+        "name": "Brat Generator",
+        "endpoint": "/api/maker/brat",
+        "filename": "brat",
+        "method": "GET",
+        "params": [
+          {
+            "name": "text",
+            "required": true,
+            "description": "Text"
+          }
+        ]
+      }
+    ],
+    "random": [
+      {
+        "name": "Random Waifu",
+        "endpoint": "/api/random/waifu",
+        "filename": "waifu",
+        "method": "GET",
+        "params": []
+      }
+    ],
+    "tools": [
+      {
+        "name": "Screenshot Web",
+        "endpoint": "/api/tools/ssweb",
+        "filename": "ssweb",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Website URL"
+          },
+          {
+            "name": "type",
+            "required": false,
+            "description": "mobile | desktop"
+          }
+        ]
+      },
+      {
+        "name": "Short URL",
+        "endpoint": "/api/tools/shorturl",
+        "filename": "shorturl",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Original URL"
+          },
+          {
+            "name": "alias",
+            "required": false,
+            "description": "Custom Alias"
+          }
+        ]
+      }
+    ],
+    "download": [
+      {
+        "name": "Facebook Downloader",
+        "endpoint": "/api/download/facebook",
+        "filename": "facebook",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Facebook URL"
+          }
+        ]
+      },
+      {
+        "name": "Youtube Downloader MP3",
+        "endpoint": "/api/download/ytmp3",
+        "filename": "ytmp3",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Youtube URL"
+          }
+        ]
+      },
+      {
+        "name": "Youtube Downloader Mp3/Mp4",
+        "endpoint": "/api/download/ytdl",
+        "filename": "ytdl",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Youtube URL"
+          },
+          {
+            "name": "type",
+            "required": false,
+            "description": "mp3 | mp4"
+          }
+        ]
+      },
+      {
+        "name": "Threads Downloader",
+        "endpoint": "/api/download/threadsdl",
+        "filename": "Thdl",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Threads URL"
+          }
+        ]
+      },
+      {
+        "name": "Instagram Downloader",
+        "endpoint": "/api/download/instagram",
+        "filename": "instagram",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Instagram URL"
+          }
+        ]
+      },
+      {
+        "name": "TikTok Downloader",
+        "endpoint": "/api/download/tiktok",
+        "filename": "tiktok",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "TikTok URL"
+          }
+        ]
+      },
+      {
+        "name": "Play Downloader",
+        "endpoint": "/api/search/play",
+        "filename": "play",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Query"
+          }
+        ]
+      }
+    ],
+    "search": [
+      {
+        "name": "Youtube Search",
+        "endpoint": "/api/search/yts",
+        "filename": "yts",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Query"
+          }
+        ]
+      },
+      {
+        "name": "TikTok Search",
+        "endpoint": "/api/search/tiktok",
+        "filename": "tiktok",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Query"
+          }
+        ]
+      },
+      {
+        "name": "Pinterest Search",
+        "endpoint": "/api/search/pinterest",
+        "filename": "pinterest",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Query"
+          }
+        ]
+      }
+    ]
+  }
+}

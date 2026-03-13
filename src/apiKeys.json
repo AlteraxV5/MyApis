@@ -1,0 +1,21 @@
+{
+  "default_limit": 100,
+  "keys": {
+    "Admin_aNMO45OOUOO2ZjS2owlE": {
+      "name": "Admin Master",
+      "role": "admin",
+      "limit": -1,
+      "used": 0,
+      "created": "2026-02-01T07:02:39.806Z",
+      "note": "Unlimited usage - Super Admin"
+    },
+    "Premium_DF7FWAaUqZLPaPmhq67q": {
+      "name": "Premium User",
+      "role": "premium",
+      "limit": 100,
+      "used": 0,
+      "created": "2026-02-01T07:02:39.806Z",
+      "note": "Limited usage - Premium Plan"
+    }
+  }
+}
