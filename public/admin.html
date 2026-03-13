@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN - AKSESs</title>
+    <link id="favicon" rel="icon" href="/src/AltOffx.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;700;800&display=swap">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { mono: ['"JetBrains Mono"', 'monospace'], display: ['"Space Mono"', 'monospace'] },
+                    colors: { primary: '#8b5cf6', 'sky-blue': '#38bdf8', 'term-bg': '#1e1e1e' },
+                    boxShadow: { 'hard': '4px 4px 0px 0px #8b5cf6', 'hard-hover': '2px 2px 0px 0px #8b5cf6' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { transition: background-color 0.5s ease, color 0.5s ease; overflow-x: hidden; }
+        #fixed-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -50;
+            background-image: url('https://c.termai.cc/i181/aGwK.png'), url('https://c.termai.cc/i155/wbV.jpg');
+            background-position: bottom right, center center; background-size: 85% auto, cover; background-repeat: no-repeat;
+        }
+        .backdrop-overlay { background-color: rgba(255, 255, 255, 0.6); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -40; transition: background-color 0.5s ease; }
+        .code-card { background: white; border: 2px solid #8b5cf6; border-radius: 0.5rem; padding: 1rem; transition: all 0.2s; box-shadow: 4px 4px 0px 0px #8b5cf6; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 3px; }
+        #falling-flowers-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 45; }
+        .falling-flower-wrapper { position: absolute; top: 0; animation: flower-fall linear forwards; }
+        @keyframes flower-fall { from { transform: translateY(-60px) rotate(0deg); } to { transform: translateY(110vh) rotate(360deg); } }
+        
+        body.galaxy-theme { background-color: #050508; color: #e2e8f0; }
+        body.galaxy-theme #fixed-bg {
+            background-image: none !important;
+            background: radial-gradient(circle at 15% 50%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
+            filter: blur(40px);
+        }
+        body.galaxy-theme .backdrop-overlay { background-color: rgba(5, 5, 8, 0.85); backdrop-filter: blur(4px); }
+        body.galaxy-theme nav, body.galaxy-theme .bg-white {
+            background-color: rgba(15, 15, 22, 0.85) !important;
+            border-color: rgba(168, 85, 247, 0.4) !important;
+            color: #f8fafc !important;
+        }
+
+        body.galaxy-theme .text-primary { color: #8b5cf6 !important; }
+        body.galaxy-theme .text-sky-blue { color: #38bdf8 !important; }
+
+        body.galaxy-theme input, body.galaxy-theme select {
+            background-color: rgba(10, 10, 15, 0.8) !important;
+            color: #ffffff !important;
+            border-color: rgba(168, 85, 247, 0.5) !important;
+        }
+        body.galaxy-theme .text-slate-800 { color: #cbd5e1 !important; }
+        body.galaxy-theme .code-card { background-color: rgba(20, 20, 30, 0.6) !important; border-color: #a855f7; }
+        body.galaxy-theme #sidebar { background-color: rgba(15, 15, 22, 0.95) !important; border-color: #a855f7 !important; }
+        #stars-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40; display: none; }
+        .star { position: absolute; background-color: #ffffff; border-radius: 50%; animation: twinkle infinite ease-in-out; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 0.9; transform: scale(1.2); box-shadow: 0 0 6px rgba(255,255,255,0.8), 0 0 10px rgba(168,85,247,0.5); } }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen font-mono relative">
+    <div id="stars-container"></div>
+    <div id="falling-flowers-container"></div>
+    <div id="fixed-bg"></div>
+    <div class="backdrop-overlay"></div>
+
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-[80] hidden opacity-0 transition-opacity duration-300"></div>
+
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white border-r-2 border-primary transform -translate-x-full transition-transform duration-300 z-[90] flex flex-col shadow-[4px_0px_0px_0px_#8b5cf6]">
+        <div class="h-16 border-b-2 border-primary flex items-center justify-between px-4">
+            <h2 class="font-display font-bold text-xl italic text-primary">MENU</h2>
+            <button onclick="toggleSidebar()" class="text-2xl text-primary hover:text-red-500 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex-1 flex flex-col gap-3 p-4">
+            <a href="/dashboard" class="px-4 py-3 border-2 border-primary rounded font-bold text-white bg-primary hover:bg-primary/90 transition-all flex items-center gap-3 shadow-[2px_2px_0px_0px_#000]">
+                <i class="fas fa-chart-pie w-5 text-center"></i> DASHBOARD
+            </a>
+        </div>
+    </div>
+
+    <nav class="border-b-2 border-primary bg-white/90 sticky top-0 z-[60]">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between relative">
+            <div class="flex items-center gap-3">
+                <button id="shieldBtn" onclick="toggleSidebar()" class="w-10 h-10 bg-primary text-white flex items-center justify-center font-bold text-xl shadow-hard border-2 border-black hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer relative z-[70]">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span>
+                    </span>
+                </button>
+                <h1 class="font-display font-bold text-xl tracking-tighter uppercase italic text-primary">ADMIN API</h1>
+            </div>
+            <a href="/docs" class="flex items-center gap-1 text-primary font-bold text-sm hover:underline">
+                <i class="fas fa-arrow-left text-xs"></i> BACK
+            </a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 relative z-10">
+        <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2 italic">
+                    <span class="w-2 h-6 bg-primary"></span> APIKEY GENERATOR
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="text-[10px] font-bold text-primary uppercase block mb-1">Admin Username</label>
+                    <input type="text" id="adminUser" class="w-full border-2 border-primary/20 p-3 font-mono text-sm focus:border-primary focus:outline-none rounded">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-primary uppercase block mb-1">Admin Password</label>
+                    <input type="password" id="adminPass" class="w-full border-2 border-primary/20 p-3 font-mono text-sm focus:border-primary focus:outline-none rounded">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-primary uppercase block mb-1">Role Type</label>
+                    <select id="role" onchange="toggleLimit()" class="w-full border-2 border-primary/20 p-3 font-mono text-sm focus:border-primary focus:outline-none rounded">
+                        <option value="premium">Premium (Limited)</option>
+                        <option value="unlimited">Unlimited (Admin/VIP)</option>
+                    </select>
+                </div>
+                <div id="limitWrapper">
+                    <label class="text-[10px] font-bold text-primary uppercase block mb-1">Limit Request</label>
+                    <input type="number" id="limit" value="100" class="w-full border-2 border-primary/20 p-3 font-mono text-sm focus:border-primary focus:outline-none rounded">
+                </div>
+            </div>
+            <button id="btnGenerate" onclick="generateKey()" class="w-full bg-primary text-white font-bold py-4 border-2 border-black shadow-hard hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all uppercase tracking-widest">
+                <i class="fas fa-plus-circle mr-2"></i> Generate & Save
+            </button>
+        </div>
+
+        <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-display font-bold text-primary flex items-center gap-2 italic">
+                    <span class="w-2 h-6 bg-sky-blue"></span> DATABASE KEYS
+                </h2>
+                <button onclick="loadKeys()" class="bg-slate-800 text-white px-4 py-2 text-xs font-bold border-2 border-black shadow-[2px_2px_0px_0px_#000] hover:shadow-none transition-all">
+                    <i class="fas fa-sync-alt mr-2" id="syncIcon"></i> REFRESH
+                </button>
+            </div>
+            
+            <div id="keyList" class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                <div class="text-center py-20 opacity-40">
+                    <i class="fas fa-circle-notch fa-spin text-4xl mb-3 text-primary"></i>
+                    <p class="font-bold text-sm uppercase">Loading database...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="custom-toast" class="fixed bottom-5 right-5 z-[100] transform translate-y-32 opacity-0 transition-all duration-300">
+        <div class="bg-primary text-white px-6 py-3 font-bold text-xs shadow-hard rounded flex items-center gap-3 border-2 border-black">
+            <i class="fa-solid fa-bell"></i>
+            <span id="toast-message">SUCCESS</span>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function applyTheme() {
+            const theme = localStorage.getItem('theme');
+            const starsContainer = document.getElementById('stars-container');
+            const flowersContainer = document.getElementById('falling-flowers-container');
+            if(theme === 'galaxy') {
+                document.body.classList.add('galaxy-theme');
+                if(flowersContainer) flowersContainer.style.display = 'none';
+                createStars();
+            } else {
+                document.body.classList.remove('galaxy-theme');
+                if(flowersContainer) flowersContainer.style.display = 'block';
+                if(starsContainer) starsContainer.style.display = 'none';
+            }
+        }
+
+        function createStars() {
+            const sc = document.getElementById('stars-container');
+            if(!sc) return;
+            sc.style.display = 'block';
+            sc.innerHTML = ''; 
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                const size = Math.random() * 2 + 0.5; 
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.animationDuration = (2 + Math.random() * 4) + 's';
+                star.style.animationDelay = (Math.random() * 5) + 's';
+                sc.appendChild(star);
+            }
+        }
+
+        window.addEventListener('storage', (e) => { if (e.key === 'theme') applyTheme(); });
+
+        function toggleLimit() {
+            const role = document.getElementById('role').value;
+            const limitField = document.getElementById('limitWrapper');
+            limitField.style.opacity = (role === 'unlimited') ? '0.3' : '1';
+            limitField.style.pointerEvents = (role === 'unlimited') ? 'none' : 'auto';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('custom-toast');
+            document.getElementById('toast-message').innerText = msg.toUpperCase();
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-32', 'opacity-0'), 3000);
+        }
+
+        async function loadKeys() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            const icon = document.getElementById('syncIcon');
+            if(!user || !pass) {
+                document.getElementById('keyList').innerHTML = '<div class="text-center py-20 opacity-40"><i class="fas fa-lock text-4xl mb-3 text-primary"></i><p class="font-bold text-sm uppercase">Enter Admin Credentials</p></div>';
+                return;
+            }
+            icon.classList.add('animate-spin');
+            try {
+                const response = await fetch(`/admin/list-apikey?username=${user}&password=${pass}&_t=${Date.now()}`);
+                const keys = await response.json();
+                const container = document.getElementById('keyList');
+                container.innerHTML = '';
+                icon.classList.remove('animate-spin');
+                if(!keys || keys.length === 0) {
+                    container.innerHTML = '<p class="text-center py-10 opacity-50 uppercase font-bold">Database Empty</p>';
+                    return;
+                }
+                keys.forEach(k => {
+                    const isUnlimited = k.role === 'unlimited';
+                    container.innerHTML += `
+                        <div id="key-${k.apikey}" class="code-card flex flex-col sm:flex-row justify-between items-center gap-4 group">
+                            <div class="flex-1 min-w-0 w-full">
+                                <p class="font-mono text-primary font-bold break-all text-lg">${k.apikey}</p>
+                                <div class="flex gap-3 mt-2">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded border-2 ${isUnlimited ? 'border-yellow-500 text-yellow-500' : 'border-green-500 text-green-500'} uppercase">
+                                        ${k.role}
+                                    </span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded border-2 border-slate-300 text-slate-500 uppercase">
+                                        Limit: ${isUnlimited ? '∞' : k.limit}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 shrink-0">
+                                <button onclick="navigator.clipboard.writeText('${k.apikey}'); showToast('COPIED!')" class="w-10 h-10 border-2 border-primary text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all shadow-[2px_2px_0px_0px_#8b5cf6] hover:shadow-none" title="Copy">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button onclick="deleteKey('${k.apikey}')" class="w-10 h-10 border-2 border-red-500 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(239,68,68,1)] hover:shadow-none" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>`;
+                });
+            } catch (err) {
+                icon.classList.remove('animate-spin');
+                showToast('Failed to load DB');
+            }
+        }
+
+        async function deleteKey(key) {
+            if(!confirm('🚨 Hapus key ini?')) return;
+            const el = document.getElementById(`key-${key}`);
+            if(el) el.style.opacity = '0.4';
+            try {
+                const response = await fetch('/admin/delete-apikey', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        username: document.getElementById('adminUser').value, 
+                        password: document.getElementById('adminPass').value, 
+                        apikey: key 
+                    })
+                });
+                const result = await response.json();
+                if (result.status) { 
+                    showToast('DELETED');
+                    setTimeout(() => loadKeys(), 800);
+                } else {
+                    if(el) el.style.opacity = '1';
+                    showToast(result.message || 'FAILED');
+                }
+            } catch (err) { 
+                if(el) el.style.opacity = '1';
+                showToast('SERVER ERROR'); 
+            }
+        }
+
+        async function generateKey() {
+            const btn = document.getElementById('btnGenerate');
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            if(!user || !pass) return showToast('Login admin required!');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> SAVING...';
+            btn.disabled = true;
+            try {
+                const response = await fetch('/admin/generate-apikey', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: user,
+                        password: pass,
+                        role: document.getElementById('role').value,
+                        limit: document.getElementById('limit').value || 100
+                    })
+                });
+                const result = await response.json();
+                if (result.status) {
+                    showToast('Generated!');
+                    setTimeout(() => loadKeys(), 800);
+                } else { showToast(result.message); }
+            } catch (err) { showToast('Server Error'); }
+            finally {
+                btn.innerHTML = '<i class="fas fa-plus-circle mr-2"></i> Generate & Save';
+                btn.disabled = false;
+            }
+        }
+
+        function fallingFlower() {
+            const container = document.getElementById('falling-flowers-container');
+            if(!container) return;
+            const imgs = ['https://c.termai.cc/i193/Zuhw5.png','https://c.termai.cc/i151/ScGW.png','https://c.termai.cc/i156/QVY3n.png'];
+            setInterval(() => {
+                if(document.body.classList.contains('galaxy-theme')) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'falling-flower-wrapper';
+                const size = 15 + Math.random() * 15;
+                wrapper.style.cssText = `width:${size}px; height:${size}px; left:${Math.random()*100}vw; animation-duration:${8+Math.random()*7}s`;
+                const flower = document.createElement('div');
+                flower.style.cssText = `width:100%; height:100%; background-image:url('${imgs[Math.floor(Math.random()*3)]}'); background-size:contain; opacity:0.6`;
+                wrapper.appendChild(flower);
+                container.appendChild(wrapper);
+                setTimeout(() => wrapper.remove(), 15000);
+            }, 900);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+            fallingFlower();
+            const savedUser = localStorage.getItem('panelAdminUser');
+            const savedPass = localStorage.getItem('panelAdminPass');
+            if (savedUser && savedPass) {
+                document.getElementById('adminUser').value = savedUser;
+                document.getElementById('adminPass').value = savedPass;
+                loadKeys();
+            }
+        });
+    </script>
+</body>
+</html>
