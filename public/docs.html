@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-API PREMIUM</title>
+    <link id="favicon" rel="icon" href="/src/AltOffx.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700;800&display=swap">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease, background-image 0.5s ease;
+            position: relative;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #8b5cf6;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #7c3aed;
+        }
+
+        ::selection {
+            background: #8b5cf6;
+            color: #ffffff;
+        }
+
+        .scanline {
+            position: fixed;
+            top: -100px;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            z-index: 999;
+            background: linear-gradient(
+                0deg,
+                rgba(0,0,0,0) 0%,
+                rgba(255,255,255,0.04) 50%,
+                rgba(0,0,0,0) 100%
+            );
+            opacity: 0.1;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanline {
+            from { top: -100px; }
+            to { top: 100vh; }
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .string { color: #a5d6ff; }
+        .number { color: #ff7b72; }
+        .boolean { color: #79c0ff; }
+        .key { color: #d2a8ff; }
+
+        .login-box {
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 0 30px #8b5cf6;
+            text-align: center;
+            align-items: center; 
+            width: 500px; 
+            margin: 50px auto; 
+            gap: 20px;  
+        }
+
+        .login-box input {
+            width: 85%;
+            padding: 13px;
+            margin: 11px 0; 
+            border-radius: 6px;
+            text-align: center; 
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .login-box button {
+            width: 60%;          
+            padding: 14px 24px; 
+            border-radius: 8px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .login-box button:hover {
+            background: #7c3aed;
+        }
+
+        .docs-page {
+            overflow-x: hidden;
+        }
+
+        .docs-page html,
+        .docs-page body {
+            zoom: 0.95;
+        }
+
+        body.docs-page {
+            background-color: #f3f4f6;
+            background-image:
+                linear-gradient(#e5e7eb 1px, transparent 1px),
+                linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        #fixed-bg {
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            z-index: -50;
+            background-image: url('https://c.termai.cc/i181/aGwK.png'), url('https://c.termai.cc/i155/wbV.jpg');
+            background-position: bottom right, center center;
+            background-size: 85% auto, cover;
+            background-repeat: no-repeat;
+            transition: all 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            #fixed-bg {
+                background-size: 110% auto, cover;
+                background-position: bottom right, center center;
+            }
+        }
+
+        .backdrop-overlay {
+            background-color: rgba(255, 255, 255, 0.7);
+            position: fixed;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            z-index: -40;
+            transition: background-color 0.5s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .docs-page .crt-text { 
+            text-shadow: 0 0 2px rgba(139, 92, 246, 0.2); 
+        }
+
+        .docs-page .marquee-container { 
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); 
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        @keyframes ticker { 
+            0% { transform: translateX(100%); } 
+            100% { transform: translateX(-100%); } 
+        }
+
+        .docs-page .animate-ticker { 
+            animation: ticker 25s linear infinite; 
+            white-space: nowrap; 
+            display: inline-block; 
+            padding-left: 100%; 
+        }
+
+        @keyframes spin { 
+            from { transform: rotate(0deg); } 
+            to { transform: rotate(360deg); } 
+        }
+
+        .docs-page .animate-spin-slow { 
+            animation: spin 4s linear infinite; 
+        }
+
+        .docs-page .json-key { color: #8b5cf6; font-weight: bold; } 
+        .docs-page .json-string { color: #0ea5e9; } 
+        .docs-page .json-number { color: #f59e0b; } 
+        .docs-page .json-boolean { color: #10b981; font-weight: bold; } 
+        .docs-page .json-null { color: #94a3b8; font-style: italic; } 
+
+        .docs-page .term-success { color: #10b981; }
+        .docs-page .term-error { color: #ef4444; }
+        .docs-page .term-warn { color: #f59e0b; }
+        .docs-page .term-info { color: #38bdf8; }
+
+        @keyframes popUp {
+            from { transform: scale(0.95); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pop {
+            animation: popUp 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+
+        #falling-flowers-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 45;
+        }
+
+        .falling-flower-wrapper {
+            position: absolute;
+            top: 0;
+            animation-name: flower-fall;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
+        }
+
+        .falling-flower {
+            width: 100%;
+            height: 100%;
+            opacity: 0.7; 
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation-name: flower-sway;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes flower-fall {
+            from { transform: translateY(-60px) rotate(0deg); }
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        @keyframes flower-sway {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(25px); }
+            100% { transform: translateX(0); }
+        }
+
+        .music-widget {
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+
+        .music-open {
+            transform: translateX(0) !important;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+
+        .music-close {
+            transition: transform 0.45s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+        }
+
+        #btn-play {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        #btn-play:hover {
+            background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+
+        #music-toggle {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+        }
+
+        body.galaxy-theme {
+            background-color: #050508;
+            background-image:
+                linear-gradient(rgba(147, 51, 234, 0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(147, 51, 234, 0.07) 1px, transparent 1px);
+            background-size: 30px 30px; 
+            color: #e2e8f0;
+            transition: background-color 0.5s ease, background-image 0.5s ease;
+        }
+
+        body.galaxy-theme #fixed-bg {
+            background-image: none !important;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
+            filter: blur(40px);
+            z-index: -50;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            animation: pulse-nebula 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-nebula {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        body.galaxy-theme .backdrop-overlay {
+            background-color: rgba(5, 5, 8, 0.85); 
+            backdrop-filter: blur(4px);
+        }
+
+        body.galaxy-theme nav {
+            background-color: rgba(10, 10, 15, 0.85) !important;
+            border-color: #a855f7 !important;
+            box-shadow: 0 4px 20px rgba(147, 51, 234, 0.15) !important;
+        }
+
+        body.galaxy-theme footer {
+            background-color: rgba(10, 10, 15, 0.9) !important;
+            border-color: #a855f7 !important;
+            color: #94a3b8 !important;
+        }
+
+        body.galaxy-theme .bg-white {
+            background-color: rgba(15, 15, 22, 0.7) !important;
+            border-color: rgba(168, 85, 247, 0.4) !important;
+            color: #f8fafc !important;
+            backdrop-filter: blur(8px);
+        }
+
+        body.galaxy-theme .bg-white\/90 {
+            background-color: rgba(15, 15, 22, 0.85) !important;
+        }
+
+        body.galaxy-theme .text-slate-800, 
+        body.galaxy-theme .text-gray-500 {
+            color: #cbd5e1 !important;
+        }
+
+        body.galaxy-theme .border-primary {
+            border-color: #a855f7 !important;
+        }
+
+        body.galaxy-theme .text-primary {
+            color: #c084fc !important;
+            text-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+        }
+
+        body.galaxy-theme .bg-primary {
+            background-color: #9333ea !important;
+        }
+
+        body.galaxy-theme .shadow-hard {
+            box-shadow: 4px 4px 0px 0px rgba(168, 85, 247, 0.4) !important;
+        }
+
+        body.galaxy-theme .shadow-hard-hover:hover {
+            box-shadow: 2px 2px 0px 0px rgba(168, 85, 247, 0.6), 0 0 15px rgba(147, 51, 234, 0.3) !important;
+            border-color: #c084fc !important;
+        }
+
+        body.galaxy-theme .bg-gray-50 {
+            background-color: rgba(25, 25, 35, 0.6) !important;
+            color: #f8fafc !important;
+            border-color: rgba(168, 85, 247, 0.2) !important;
+        }
+
+        body.galaxy-theme input {
+            background-color: rgba(10, 10, 15, 0.8) !important;
+            color: #ffffff !important;
+            border-color: rgba(168, 85, 247, 0.5) !important;
+        }
+        
+        body.galaxy-theme input:focus {
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3) !important;
+            border-color: #c084fc !important;
+            background-color: rgba(20, 20, 30, 0.9) !important;
+        }
+
+        body.galaxy-theme .hover\:bg-gray-50:hover {
+            background-color: rgba(35, 35, 50, 0.8) !important;
+        }
+
+        body.galaxy-theme .bg-black\/40 {
+            background-color: rgba(0, 0, 0, 0.7) !important;
+        }
+
+        body.galaxy-theme .border-primary\/20 {
+            border-color: rgba(168, 85, 247, 0.2) !important;
+        }
+
+        body.galaxy-theme .border-primary\/30 {
+            border-color: rgba(168, 85, 247, 0.3) !important;
+        }
+
+        body.galaxy-theme .bg-primary\/10 {
+            background-color: rgba(168, 85, 247, 0.1) !important;
+        }
+
+        body.galaxy-theme .text-slate-700 {
+            color: #e2e8f0 !important;
+        }
+
+        body.galaxy-theme #music-widget .bg-white {
+            background-color: rgba(15, 15, 22, 0.95) !important;
+            border-color: #a855f7 !important;
+        }
+
+        body.galaxy-theme ::-webkit-scrollbar-track {
+            background: #050508;
+            border-left: 1px solid #1f2937;
+        }
+
+        body.galaxy-theme ::-webkit-scrollbar-thumb { 
+            background: #9333ea; 
+            border: 1px solid #050508;
+        }
+
+        body.galaxy-theme ::-webkit-scrollbar-thumb:hover {
+            background: #a855f7;
+            box-shadow: 0 0 10px #a855f7;
+        }
+
+        #stars-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 40;
+            display: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            animation: twinkle infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.2); box-shadow: 0 0 6px rgba(255,255,255,0.8), 0 0 10px rgba(168,85,247,0.5); }
+        }
+
+        .code-card {
+            background: white; 
+            border: 2px solid #8b5cf6; 
+            border-radius: 0.5rem; 
+            padding: 1rem;
+            transition: all 0.2s ease; 
+            box-shadow: 4px 4px 0px 0px #8b5cf6; 
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .code-card:hover { 
+            transform: translate(-2px, -2px); 
+            box-shadow: 6px 6px 0px 0px #8b5cf6; 
+        }
+
+        #searchInput:focus { 
+            box-shadow: 4px 4px 0px 0px #8b5cf6; 
+            transform: translate(-2px, -2px); 
+        }
+        
+        #view-detail pre code {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            overflow-x: hidden !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            tab-size: 4 !important;
+        }
+
+        #view-detail pre {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            max-height: 700px !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            tab-size: 4 !important;
+            -moz-tab-size: 4 !important;
+        }
+
+        #view-detail .code-wrapper {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        @media (max-width: 768px) {
+            html, body {
+                zoom: 0.95;
+                width: 100%;
+                height: 100%;
+                overflow-x: hidden;
+            }
+            
+            #view-detail pre {
+                font-size: 13px !important;
+                padding: 14px !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                max-height: 450px !important;
+            }
+            
+            #viewCode {
+                font-size: 13px !important;
+                line-height: 1.5 !important;
+            }
+            
+            .bg-term-bg {
+                border-radius: 8px;
+                overflow: hidden;
+                margin-top: 10px;
+            }
+            
+            #view-detail button {
+                padding: 10px 14px;
+                min-height: 40px;
+                font-size: 12px;
+            }
+            
+            #view-detail .bg-\[\#2d2d2d\] {
+                padding: 12px 14px;
+            }
+            
+            .code-page pre[class*="language-"] {
+                margin: 0 !important;
+                border-radius: 0 0 8px 8px !important;
+                background: #0d1117 !important;
+                border-top: 1px solid #30363d;
+                font-size: 13px !important;
+            }
+            
+            .code-card {
+                padding: 14px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 10px;
+            }
+            
+            .code-card > div:first-child {
+                width: 100%;
+            }
+            
+            .code-card .flex.items-center.gap-4 {
+                width: 100%;
+            }
+            
+            #searchInput {
+                height: 55px;
+                font-size: 15px;
+                padding-left: 50px;
+            }
+            
+            .fa-magnifying-glass {
+                top: 18px;
+                left: 16px;
+                font-size: 18px;
+            }
+            
+            #addCodeModal > div {
+                max-height: 80vh;
+                overflow-y: auto;
+                width: 95%;
+                margin: 0 auto;
+            }
+            
+            #codeGrid {
+                gap: 10px;
+            }
+            
+            #tagFilters {
+                overflow-x: auto;
+                padding-bottom: 10px;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            #tagFilters button {
+                padding: 8px 12px;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+            
+            #viewTitle {
+                font-size: 26px;
+                line-height: 1.2;
+            }
+            
+            #viewDesc {
+                font-size: 14px;
+                line-height: 1.5;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            html, body {
+                zoom: 0.93;
+                width: 100%;
+                height: 100%;
+            }
+            
+            #view-detail pre {
+                font-size: 12px !important;
+                padding: 12px !important;
+            }
+            
+            #viewCode {
+                font-size: 12px !important;
+            }
+            
+            #viewTitle {
+                font-size: 22px;
+            }
+            
+            .code-card {
+                padding: 12px;
+            }
+            
+            #view-detail .bg-\[\#2d2d2d\] .flex.gap-2 button {
+                padding: 8px 12px;
+                font-size: 10px;
+                margin: 2px;
+            }
+        }
+        
+        .custom-scrollbar {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        body {
+            touch-action: pan-x pan-y;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        mono: ['"JetBrains Mono"', 'monospace'], 
+                        display: ['"Space Mono"', 'monospace'], 
+                    },
+                    colors: { 
+                        'bg-main': '#f8fafc', 
+                        'term-bg': '#1e1e1e', 
+                        'term-text': '#d4d4d4', 
+                        'primary': '#8b5cf6', 
+                        'sky-blue': '#38bdf8', 
+                        'success': '#4ade80', 
+                        'warning': '#facc15', 
+                        'error': '#f87171'
+                    },
+                    boxShadow: { 
+                        'hard': '4px 4px 0px 0px #8b5cf6', 
+                        'hard-hover': '2px 2px 0px 0px #8b5cf6',
+                    },
+                    animation: {
+                        'blink': 'blink 1s step-end infinite',
+                        'slide-down': 'slideDown 0.3s ease-out forwards',
+                        'marquee': 'marquee 15s linear infinite',
+                    },
+                    keyframes: {
+                        blink: { 
+                            '0%, 100%': { opacity: '1' }, 
+                            '50%': { opacity: '0' } 
+                        },
+                        slideDown: { 
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' }, 
+                            '100%': { opacity: '1', transform: 'translateY(0)' } 
+                        },
+                        marquee: { 
+                            '0%': { transform: 'translateX(100%)' }, 
+                            '100%': { transform: 'translateX(-150%)' } 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body
+    class="docs-page text-slate-800 min-h-screen flex flex-col font-mono relative code-page"
+    data-role="guest"
+>
+    <div id="stars-container"></div>
+    <div id="falling-flowers-container"></div>
+    
+    <div id="fixed-bg"></div>
+    <div class="backdrop-overlay"></div>
+    
+    <nav class="border-b-2 border-primary bg-white/90 sticky top-0 z-[60]">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4 justify-between">
+            <div class="flex items-center gap-3 shrink-0">
+                <a 
+                    href="/" 
+                    class="w-10 h-10 bg-primary text-white flex items-center justify-center font-bold text-xl shadow-hard border-2 border-black hover:bg-primary/90 hover:scale-95 transition-all cursor-pointer"
+                >
+                    <i class="fa-solid fa-cat"></i>
+                </a>
+                <h1 
+                    id="nav-title" 
+                    class="font-display font-bold text-xl tracking-tighter uppercase italic text-primary"
+                >
+                    X-API
+                </h1>
+            </div>
+            
+            <div class="flex-1 max-w-xl mx-auto overflow-hidden h-9 bg-black border-2 border-primary flex items-center relative shadow-hard mx-4 -skew-x-12 hidden md:flex">
+                <div 
+                    id="running-text" 
+                    class="text-white text-xs font-mono font-bold uppercase tracking-widest skew-x-12 px-4 whitespace-nowrap animate-marquee inline-block min-w-full"
+                >
+                    WELCOME TO PREMIUM X-API DASHBOARD
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 shrink-0">
+                <button 
+                    id="btnLoginNav" 
+                    onclick="document.getElementById('loginModal').classList.remove('hidden')" 
+                    class="border-2 border-primary bg-white px-4 h-10 text-primary font-bold shadow-hard hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-xs flex items-center gap-2"
+                >
+                    <i class="fa-solid fa-user-shield"></i> <span class="hidden sm:inline">ADMIN</span>
+                </button>
+                <button 
+                    id="themeToggle" 
+                    onclick="toggleGalaxyTheme()" 
+                    class="w-10 h-10 border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center shadow-hard transition-all shrink-0 cursor-pointer"
+                >
+                    <i class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <a 
+                    href="https://instagram.com/altoffc" 
+                    target="_blank" 
+                    class="w-10 h-10 border-2 border-primary bg-white text-primary hover:bg-primary hover:text-white hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center shadow-hard transition-all shrink-0 cursor-pointer"
+                >
+                    <i class="fa-brands fa-instagram text-xl"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-8 grid lg:grid-cols-12 gap-8 items-start relative z-10">
+        
+        <aside class="lg:col-span-4 lg:sticky lg:top-24 flex flex-col gap-6 h-fit z-40">
+
+            <div 
+                id="mascot-widget" 
+                class="relative z-50 -mb-20 -ml-4 pointer-events-auto cursor-pointer group/mascot select-none w-fit"
+            >
+                <div 
+                    id="mascot-bubble" 
+                    class="absolute left-[90%] bottom-[40%] w-32 bg-white border-2 border-primary shadow-[4px_4px_0px_rgba(139,92,246,0.4)] p-2 opacity-0 translate-x-4 pointer-events-none transition-all duration-300 ease-out rounded-sm font-mono z-20"
+                >
+                    <p 
+                        id="mascot-text" 
+                        class="text-[10px] font-bold text-center uppercase leading-tight tracking-wide text-primary"
+                    ></p>
+                    <div class="absolute top-3 -left-3 w-4 h-4 bg-white border-l-2 border-b-2 border-primary rotate-45"></div>
+                </div>
+                <div class="relative">
+                    <img 
+                        src="https://c.termai.cc/i130/wc9vinr.png" 
+                        alt="Mascot"
+                        class="relative z-10 w-28 md:w-32 h-auto object-contain hover:-translate-y-1 hover:scale-105 transition-transform duration-300 drop-shadow-[3px_3px_0px_rgba(139,92,246,0.6)]"
+                    >
+                </div>
+            </div>
+
+            <div class="bg-term-bg border-2 border-primary shadow-hard relative overflow-hidden flex flex-col h-[400px] rounded-lg group z-40">
+                <div class="bg-gradient-to-r from-primary/10 to-sky-blue/10 p-2 flex items-center justify-between border-b border-primary/30">
+                    <div class="flex gap-2 pl-1">
+                        <div class="w-3 h-3 rounded-full bg-red-400 border border-primary"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400 border border-primary"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400 border border-primary"></div>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 font-bold tracking-wider">AltOffx | X-API</span>
+                </div>
+                
+                <div 
+                    id="term-logs" 
+                    class="p-3 font-mono text-[11px] text-gray-300 overflow-y-auto flex-1 custom-scrollbar space-y-0.5 crt-text"
+                ></div>
+                
+                <div 
+                    id="term-input-line" 
+                    class="hidden px-3 pb-2 pt-1 border-t border-gray-700 bg-term-bg"
+                >
+                    <span class="text-green-500 font-bold mr-1 text-[10px]">root@AltOffx:~/X-Api~$</span>
+                    <span class="inline-block w-2.5 h-4 bg-gray-500 align-middle ml-1 animate-blink"></span>
+                </div>
+            </div>
+            
+            <div class="relative group">
+                <input
+                    type="text"
+                    id="search-input"
+                    name="ignore-search"
+                    autocomplete="new-password"
+                    value=""
+                    readonly
+                    placeholder="SEARCH ENDPOINT..."
+                    class="w-full h-12 border-2 border-primary px-4 pl-10 font-bold text-sm uppercase focus:outline-none focus:bg-primary/5 transition-all rounded shadow-hard placeholder:text-primary/40"
+                    onfocus="this.removeAttribute('readonly')"
+                />
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-4 text-primary"></i>
+            </div>
+
+            <div class="bg-white border-2 border-primary p-5 shadow-hard rounded-lg">
+                <div class="flex justify-between items-center mb-4 border-b-2 border-dashed border-primary/20 pb-2">
+                    <h3 class="font-bold text-lg italic text-primary">SERVER STATUS</h3>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-gray-500">TIME (WIB)</span>
+                        <span 
+                            id="server-time" 
+                            class="text-slate-800 font-mono"
+                        >--:--:--</span>
+                    </div>
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-gray-500">DATE</span>
+                        <span 
+                            id="server-date" 
+                            class="text-slate-800 font-mono"
+                        >--/--/----</span>
+                    </div>
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-gray-500">VISITORS</span>
+                        <span 
+                            id="stat-visitors" 
+                            class="text-primary font-mono"
+                        >0</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div 
+            id="loginModal" 
+            class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in"
+        >
+            <div class="bg-white border-2 border-primary shadow-hard rounded-lg p-6 w-full max-w-sm relative">
+                <button 
+                    onclick="document.getElementById('loginModal').classList.add('hidden')" 
+                    class="absolute top-2 right-3 text-gray-400 hover:text-red-500 text-xl font-bold transition-colors"
+                >&times;</button>
+                
+                <h2 class="text-xl font-display font-bold text-primary mb-6 text-center">ADMIN ACCESS</h2>
+                
+                <div class="space-y-4">
+                    <input 
+                        type="text" 
+                        id="admUser" 
+                        placeholder="USERNAME" 
+                        class="w-full border-2 border-primary p-2 font-mono text-sm focus:outline-none focus:bg-primary/5 uppercase placeholder:normal-case"
+                    >
+                    <input 
+                        type="password" 
+                        id="admPass" 
+                        placeholder="PASSWORD" 
+                        class="w-full border-2 border-primary p-2 font-mono text-sm focus:outline-none focus:bg-primary/5"
+                    >
+                    <button 
+                        id="btnLoginConfirm" 
+                        onclick="doLogin()" 
+                        class="w-full bg-primary text-white font-bold py-3 border-2 border-black shadow-hard hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                    >
+                        LOGIN
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section class="lg:col-span-8 min-h-[50vh]">
+            <div 
+                id="api-container" 
+                class="space-y-4 opacity-0 translate-y-4 transition-all duration-700"
+            ></div>
+            
+            <div 
+                id="no-results" 
+                class="hidden flex-col items-center justify-center py-20 text-center opacity-50"
+            >
+                <i class="fa-solid fa-box-open text-4xl mb-3 text-primary"></i>
+                <p class="font-bold text-xl text-primary">NO DATA FOUND</p>
+            </div>
+        </section>
+        
+    </main>
+
+    <div 
+        id="custom-toast" 
+        class="fixed bottom-5 right-5 z-[100] transform translate-y-32 opacity-0 transition-all duration-300"
+    >
+        <div class="bg-primary text-white px-4 py-3 font-bold text-xs shadow-hard rounded flex items-center gap-3 border-2 border-black">
+            <i class="fa-solid fa-check"></i>
+            <span id="toast-message">SUCCESS</span>
+        </div>
+    </div>
+    
+    <footer class="border-t-2 border-primary/30 bg-white/80 backdrop-blur-sm py-8 relative z-10 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 font-bold text-xs uppercase tracking-wider">
+            <span class="bg-gradient-to-r from-primary to-sky-blue text-white px-2 py-1 rounded">
+                &copy; 2026 AltOfficialID
+            </span>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-primary transition-colors px-1">Terms</a>
+                <a href="#" class="hover:text-primary transition-colors px-1">Privacy</a>
+                <a href="#" class="hover:text-primary transition-colors px-1">Status</a>
+            </div>
+        </div>
+    </footer>
+    
+    <div 
+        id="music-widget" 
+        class="fixed bottom-24 right-0 z-50 flex items-center transition-transform duration-500 translate-x-[calc(100%-2.5rem)] md:translate-x-[calc(100%-3rem)] font-mono drop-shadow-2xl"
+    >
+        <button 
+            id="music-toggle" 
+            class="bg-highlight text-white border-2 border-r-0 border-primary p-3 h-28 w-10 md:w-12 flex items-center justify-center cursor-pointer hover:bg-sky-blue transition-colors relative z-20 group rounded-l-lg"
+        >
+            <div class="absolute inset-0 bg-primary/20 w-[2px] left-1"></div>
+            <i class="fa-solid fa-music text-lg animate-pulse group-hover:scale-110 transition-transform"></i>
+        </button>
+        
+        <div class="bg-white border-2 border-primary p-4 w-72 md:w-80 h-44 flex flex-col justify-between relative overflow-hidden rounded-r-lg">
+            <div class="absolute top-2 right-2 flex gap-1">
+                <div class="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                <div class="w-1.5 h-1.5 bg-sky-blue rounded-full"></div>
+            </div>
+            
+            <div class="flex gap-4 items-center relative z-10 mt-1">
+                <div class="relative shrink-0">
+                    <div 
+                        id="music-cover-container" 
+                        class="w-16 h-16 bg-gradient-to-br from-primary/30 to-sky-blue/30 border-2 border-primary rounded-full overflow-hidden shadow-[2px_2px_0_0_rgba(139,92,246,0.3)] relative"
+                    >
+                        <img 
+                            src="https://c.termai.cc/i115/SFu.jpg" 
+                            alt="Cover" 
+                            class="w-full h-full object-cover animate-spin-slow"
+                        >
+                        <div class="absolute inset-0 border-4 border-primary/20 rounded-full pointer-events-none"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full border-2 border-primary z-20"></div>
+                    </div>
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                    <div class="bg-gradient-to-r from-primary to-sky-blue text-white px-2 py-1 mb-2 -skew-x-6 w-fit rounded">
+                        <h4 class="font-bold text-xs uppercase tracking-tight whitespace-nowrap overflow-hidden">
+                            NOW PLAYING
+                        </h4>
+                    </div>
+                    <div class="marquee-container overflow-hidden whitespace-nowrap">
+                        <p class="font-bold text-sm uppercase text-primary">MEMUAT LAGU...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-auto relative z-10">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <button 
+                        id="btn-prev" 
+                        class="text-primary hover:scale-110 transition-transform"
+                    >
+                        <i class="fa-solid fa-backward-step text-lg"></i>
+                    </button>
+                    <button 
+                        id="btn-play" 
+                        class="w-10 h-10 flex items-center justify-center bg-primary text-white border-2 border-primary transition-all shadow-[3px_3px_0px_0px_rgba(139,92,246,0.3)] active:shadow-none active:translate-y-[2px] rounded"
+                    >
+                        <i class="fa-solid fa-play ml-1"></i>
+                    </button>
+                    <button 
+                        id="btn-next" 
+                        class="text-primary hover:scale-110 transition-transform"
+                    >
+                        <i class="fa-solid fa-forward-step text-lg"></i>
+                    </button>
+                </div>
+                
+                <div 
+                    class="h-4 w-full bg-gradient-to-r from-primary/20 to-sky-blue/20 border-2 border-primary/30 cursor-pointer relative group/prog rounded-full overflow-hidden" 
+                    id="progress-container"
+                >
+                    <div 
+                        id="progress-bar" 
+                        class="h-full bg-gradient-to-r from-primary to-sky-blue w-0 relative"
+                    >
+                         <div class="absolute right-[-6px] top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-primary opacity-0 group-hover/prog:opacity-100 transition-opacity rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <audio 
+                id="audio-player" 
+                src="" 
+                preload="metadata"
+            ></audio>
+        </div>
+    </div>
+
+<script>
+    const adminToken = localStorage.getItem('adminToken');
+    
+    if (!adminToken && window.location.pathname === '/admin') {
+        window.location.href = '/';
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    let globalConfig = null;
+    let toastTimeout;
+    let allCodes = [];
+    let isAdmin = false;
+
+    function isMobileDevice() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    async function init() {
+        if (isMobileDevice()) {
+            document.body.classList.add('is-mobile');
+        }
+        
+        if (document.getElementById('codeGrid')) {
+            document.body.classList.add('code-page');
+            await initCodePage();
+            return;
+        }
+
+        if (document.getElementById('term-logs')) {
+            try {
+                const response = await fetch('/config').catch(() => {
+                    return {
+                        json: async () => ({
+                            settings: { apiName: "PREMIUM REST API", visitors: 9999, apiVersion: "2.5.0" },
+                            tags: {
+                                "DOWNLOADER": [
+                                    { name: "Tiktok Downloader", endpoint: "/api/dl/tiktok", method: "GET", params: [{ name: "url", required: true }] },
+                                    { name: "Instagram Downloader", endpoint: "/api/dl/ig", method: "GET", params: [{ name: "url", required: true }] }
+                                ],
+                                "AI / CHATGPT": [
+                                    { name: "GPT 4o", endpoint: "/api/ai/gpt4", method: "GET", params: [{ name: "text", required: true }] }
+                                ]
+                            }
+                        })
+                    }
+                });
+                
+                globalConfig = await response.json();
+                
+                setUi(globalConfig);
+                loadEnd(globalConfig.tags);
+                startWIBClock();
+                await kuroneko(globalConfig);
+                loadReminder(); 
+                setSearch();
+            } catch (e) {
+                document.getElementById('term-logs').innerHTML = `<span class="text-red-400 font-bold px-1">SYSTEM FAILURE</span><br>${e.message}`;
+            }
+        }
+    }
+
+    async function initCodePage() {
+        checkAuth();
+        setupRouting();
+        
+        const addForm = document.getElementById('addCodeForm');
+        if (addForm) {
+            addForm.addEventListener('submit', handleAddCodeSubmit);
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        
+        if (id) {
+            await loadDetail(id);
+        } else {
+            await loadList();
+        }
+        
+        const searchInput = document.getElementById('searchInput');
+        if(searchInput) {
+            searchInput.addEventListener('input', handleCodeSearch);
+        }
+    }
+
+    async function handleAddCodeSubmit(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        const originalText = btn.innerText;
+        
+        const id = 'neko-' + Math.random().toString(36).substr(2, 6);
+        const title = e.target.title.value;
+        const desc = e.target.description.value;
+        const content = e.target.content.value;
+
+        btn.innerText = "SAVING...";
+        btn.disabled = true;
+
+        try {
+            const req = await fetch('/api/code/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, title, description: desc, content })
+            });
+            
+            const res = await req.json();
+            
+            if(res.status) {
+                document.getElementById('addCodeModal').classList.add('hidden');
+                e.target.reset();
+                loadList();
+                showToast("Snippet Saved!", "success");
+            } else {
+                showToast("Error: " + res.message, "error");
+            }
+        } catch(err) {
+            showToast("Connection Error", "error");
+        }
+        
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+
+    function handleCodeSearch(e) {
+        const term = e.target.value.toLowerCase();
+        const filtered = allCodes.filter(c => 
+            (c.title && c.title.toLowerCase().includes(term)) ||
+            c.id.toLowerCase().includes(term) || 
+            c.description.toLowerCase().includes(term)
+        );
+        renderGrid(filtered);
+    }
+
+    function checkAuth() {
+        const token = localStorage.getItem('adminToken');
+        if (token) {
+            isAdmin = true;
+            updateAdminUI();
+        }
+    }
+
+    function updateAdminUI() {
+        const loginBtn = document.getElementById('btnLoginNav');
+        if (!loginBtn) return;
+
+        if(isAdmin) {
+            loginBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">LOGOUT</span>';
+            loginBtn.classList.replace('border-primary', 'border-red-500');
+            loginBtn.classList.replace('text-primary', 'text-red-500');
+            loginBtn.onclick = logout;
+        } else {
+            loginBtn.innerHTML = '<i class="fa-solid fa-user-shield"></i> <span class="hidden sm:inline">ADMIN</span>';
+            loginBtn.classList.replace('border-red-500', 'border-primary');
+            loginBtn.classList.replace('text-red-500', 'text-primary');
+            loginBtn.onclick = () => document.getElementById('loginModal').classList.remove('hidden');
+        }
+    }
+
+    async function doLogin() {
+        const u = document.getElementById('admUser').value.trim();
+        const p = document.getElementById('admPass').value.trim();
+        const btn = document.getElementById('btnLoginConfirm');
+        
+        btn.innerText = "CHECKING...";
+        
+        try {
+            const req = await fetch('/admin/list/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            const res = await req.json();
+            
+            if (res.status) {
+                localStorage.setItem('adminToken', res.token);
+                window.location.href = '/admin';
+                return;
+            } else {
+                showToast('Wrong Credentials', 'error');
+            }
+        } catch (e) {
+            showToast('Login Error or Demo Mode Active', 'error');
+        }
+        btn.innerText = "LOGIN";
+    }
+
+    function logout() {
+        localStorage.removeItem('adminToken');
+        isAdmin = false;
+        location.reload();
+    }
+
+    async function loadList() {
+        switchView('home');
+        const container = document.getElementById('codeGrid');
+        
+        if(!container) return;
+        
+        container.innerHTML = '<div class="text-center py-10"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-primary"></i></div>';
+
+        try {
+            const req = await fetch('/admin/list/admin');
+            allCodes = await req.json();
+            if (!Array.isArray(allCodes)) allCodes = [];
+            
+            renderGrid(allCodes);
+            updateTags(allCodes);
+        } catch (e) {
+            container.innerHTML = `<div class="text-center text-red-400 font-bold">FAILED TO LOAD DATA</div>`;
+        }
+    }
+
+    function renderGrid(data) {
+        const container = document.getElementById('codeGrid');
+        if(!container) return;
+        
+        container.innerHTML = '';
+        
+        if (data.length === 0) {
+            container.innerHTML = `<div class="text-center text-gray-500 py-10 font-bold">NO SNIPPETS FOUND</div>`;
+            return;
+        }
+
+        data.forEach((item, index) => {
+            const tagMatch = item.description.match(/#(\w+)/);
+            const tag = tagMatch ? tagMatch[1] : 'snippet';
+            const date = new Date(item.createdAt).toLocaleDateString('id-ID', { 
+                day: 'numeric', month: 'short', year: 'numeric' 
+            });
+            
+            const displayTitle = item.title || item.id;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = "w-full animate-fade-in";
+            wrapper.style.animationDelay = `${index * 50}ms`;
+            
+            const deleteBtn = isAdmin ? `
+                <button onclick="deleteCode(event, '${item.id}')" class="text-white bg-red-500 hover:bg-red-600 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all px-3 py-1 text-[10px] font-bold rounded">
+                    <i class="fa-solid fa-trash mr-1"></i> DEL
+                </button>
+            ` : '';
+
+            wrapper.innerHTML = `
+                <div onclick="openDetail('${item.id}')" class="code-card cursor-pointer group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+                    <div class="flex items-center gap-4 min-w-0 flex-1">
+                        <div class="w-12 h-12 bg-primary/10 text-primary border-2 border-primary/20 flex shrink-0 items-center justify-center font-bold text-lg rounded-lg">&lt;/&gt;</div>
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-lg text-slate-800 truncate group-hover:text-primary transition-colors capitalize">${displayTitle}</h4>
+                            <div class="flex items-center gap-2 text-xs text-gray-400 font-mono mt-1">
+                                <span class="text-[10px] bg-gray-100 px-1 rounded border border-gray-200">${item.id}</span>
+                                <span>•</span>
+                                <span>${date}</span>
+                                <span class="bg-slate-700 text-white px-2 py-0.5 rounded text-[10px] uppercase font-bold">#${tag}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        ${deleteBtn}
+                        <i class="fa-solid fa-chevron-right text-gray-300 group-hover:text-primary transition-colors ml-2"></i>
+                    </div>
+                </div>
+            `;
+            container.appendChild(wrapper);
+        });
+    }
+
+    function setupRouting() {
+        window.onpopstate = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if(id) loadDetail(id);
+            else loadList();
+        };
+    }
+
+    function switchView(viewName) {
+        const views = ['home', 'detail'];
+        views.forEach(v => {
+            const el = document.getElementById(`view-${v}`);
+            if(el) {
+                if(v === viewName) el.classList.remove('hidden');
+                else el.classList.add('hidden');
+            }
+        });
+    }
+
+    function showToast(msg, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-5 right-5 px-6 py-3 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-white font-bold transform translate-y-10 opacity-0 transition-all duration-300 z-[100] flex items-center gap-3 font-mono text-sm ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+        toast.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-check-circle'}"></i> ${msg.toUpperCase()}`;
+        
+        document.body.appendChild(toast);
+        
+        requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
+        
+        setTimeout(() => {
+            toast.classList.add('translate-y-10', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function startWIBClock() {
+        const timeEl = document.getElementById('server-time');
+        const dateEl = document.getElementById('server-date');
+        if(!timeEl) return;
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', {
+                timeZone: 'Asia/Jakarta',
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('id-ID', {
+                timeZone: 'Asia/Jakarta',
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric'
+            });
+            if(timeEl) timeEl.innerText = timeString;
+            if(dateEl) dateEl.innerText = dateString;
+        }
+    }
+
+    async function loadReminder() {
+        try {
+            const req = await fetch('../src/reminder.json');
+            const data = await req.json();
+            if(data?.message) {
+                const el = document.getElementById('running-text');
+                if(el) el.innerText = data.message.toUpperCase();
+            }
+        } catch (e) { 
+            console.warn("No reminder config found, using default."); 
+        }
+    }
+
+    function messeg(msg) {
+        const toast = document.getElementById('custom-toast');
+        const msgBox = document.getElementById('toast-message');
+        if(!toast || !msgBox) return;
+        
+        msgBox.innerText = msg;
+        toast.classList.remove('translate-y-32', 'opacity-0');
+        
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.add('translate-y-32', 'opacity-0');
+        }, 3000);
+    }
+
+    function terminalLog(message, type = 'info') {
+        const logs = document.getElementById('term-logs');
+        if(!logs) return;
+
+        const line = document.createElement('div');
+        const time = new Date().toLocaleTimeString('en-US', {
+            hour12: false, 
+            hour: "2-digit", 
+            minute:"2-digit", 
+            second:"2-digit"
+        });
+        
+        let prefix = `<span class="text-primary/60 font-bold">[${time}]</span>`;
+        
+        if (type === 'error') {
+            prefix += ` <span class="text-red-500 font-bold">ERR</span>`;
+            line.className = "text-red-400";
+        } else if (type === 'success') {
+            prefix += ` <span class="text-green-500 font-bold">OK</span>`;
+            line.className = "text-green-400";
+        } else if (type === 'warn') {
+            prefix += ` <span class="text-yellow-500 font-bold">WARN</span>`;
+            line.className = "text-yellow-400";
+        } else if (type === 'req-success') {
+            line.className = "text-green-400"; 
+        } else if (type === 'req-error') {
+            line.className = "text-red-400";
+        } else {
+            prefix += ` <span class="text-blue-400 font-bold">INFO</span>`;
+            line.className = "text-gray-300";
+        }
+
+        line.innerHTML = `${prefix} ${message}`;
+        logs.appendChild(line);
+        logs.scrollTop = logs.scrollHeight;
+    }
+
+    async function kuroneko(config) {
+        const logs = document.getElementById('term-logs');
+        if(!logs) return;
+        
+        const cmdLine = document.createElement('div');
+        cmdLine.className = "mb-2 break-all flex flex-wrap items-center";
+        
+        const prompt = document.createElement('span');
+        prompt.className = "text-green-500 font-bold mr-2";
+        prompt.innerHTML = "root@AltOffx:~/RestApi~$";
+        
+        const inputCmd = document.createElement('span');
+        inputCmd.className = "text-gray-200 font-mono relative";
+        
+        const cursor = document.createElement('span');
+        cursor.className = "inline-block w-2.5 h-4 bg-green-500 align-middle ml-0.5 animate-pulse";
+        
+        cmdLine.appendChild(prompt);
+        cmdLine.appendChild(inputCmd);
+        inputCmd.appendChild(cursor);
+        logs.appendChild(cmdLine);
+
+        const cmd = "npm run dev";
+        await new Promise(r => setTimeout(r, 600));
+
+        for (let char of cmd) {
+            const randomSpeed = Math.floor(Math.random() * (120 - 40 + 1)) + 40;
+            await new Promise(r => setTimeout(r, randomSpeed));
+            const textNode = document.createTextNode(char);
+            inputCmd.insertBefore(textNode, cursor);
+        }
+        
+        await new Promise(r => setTimeout(r, 500));
+        cursor.remove();
+        
+        const printRaw = (text) => {
+            const div = document.createElement('div');
+            div.className = "text-gray-400 text-xs font-mono ml-1";
+            div.innerText = text;
+            logs.appendChild(div);
+            logs.scrollTop = logs.scrollHeight;
+        };
+
+        const version = config?.settings?.apiVersion || '2.5.0';
+        printRaw(`\n> AltOffx@${version} dev`);
+        await new Promise(r => setTimeout(r, 200));
+        printRaw(`> node src/index.js\n`);
+        await new Promise(r => setTimeout(r, 400));
+        
+        const endpoints = config?.tags ? Object.values(config.tags).flat() : [];
+        const total = endpoints.length;
+
+        terminalLog(`Loading ${total} routes...`, 'info');
+        
+        let count = 0;
+        const maxShow = 3;
+        for (const route of endpoints) {
+            if(count < maxShow) {
+                 terminalLog(`Mapped {${route.method}} ${route.endpoint}`, 'success');
+                 await new Promise(r => setTimeout(r, 50));
+            }
+            count++;
+        }
+        
+        if(count > maxShow) {
+            terminalLog(`... +${count - maxShow} hidden endpoints mapped`, 'info');
+        }
+
+        await new Promise(r => setTimeout(r, 300));
+        
+        const serverUrl = window.location.origin;
+        terminalLog(`Server is running at ${serverUrl}`, 'success');
+
+        const inputLine = document.getElementById('term-input-line');
+        if(inputLine) inputLine.classList.remove('hidden');
+        
+        const container = document.getElementById('api-container');
+        if(container) container.classList.remove('opacity-0', 'translate-y-4');
+    }
+
+    function setUi(config) {
+        const s = config?.settings || {};
+        const navTitle = document.getElementById('nav-title');
+        const statVis = document.getElementById('stat-visitors');
+        
+        if(navTitle) navTitle.innerText = s.apiName || 'REST API';
+        if(statVis) {
+            const baseDate = new Date('2024-01-01').getTime();
+            const now = Date.now();
+            const diff = Math.floor((now - baseDate) / 600000); 
+            let localVisits = parseInt(localStorage.getItem('my_visits') || '0') + 1;
+            localStorage.setItem('my_visits', localVisits);
+            statVis.innerText = (128450 + diff + localVisits).toLocaleString('id-ID');
+        }
+        
+        if (s.favicon) {
+            let link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+            link.rel = 'icon';
+            link.href = s.favicon;
+            document.head.appendChild(link);
+        }
+    }
+
+    function setSearch() {
+        const input = document.getElementById('search-input');
+        const noResults = document.getElementById('no-results');
+        if(!input) return;
+
+        input.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const isSearching = val.length > 0;
+            let anyVisible = false;
+
+            document.querySelectorAll('.api-section').forEach(section => {
+                const grid = section.querySelector('.api-section-grid');
+                const arrow = section.querySelector('.cat-arrow');
+                let matchInThisSection = 0;
+
+                section.querySelectorAll('.api-card-wrapper').forEach(card => {
+                    const txt = card.getAttribute('data-search').toLowerCase();
+                    if (txt.includes(val)) {
+                        card.classList.remove('hidden');
+                        matchInThisSection++;
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+
+                if (matchInThisSection > 0) {
+                    section.classList.remove('hidden');
+                    anyVisible = true;
+                    if (isSearching) {
+                        grid.classList.remove('hidden');
+                        arrow.classList.add('rotate-180');
+                    } else {
+                        grid.classList.add('hidden');
+                        arrow.classList.remove('rotate-180');
+                    }
+                } else {
+                    section.classList.add('hidden');
+                }
+            });
+
+            if(noResults) {
+                noResults.classList.toggle('hidden', anyVisible);
+                noResults.classList.toggle('flex', !anyVisible);
+            }
+        });
+    }
+
+    function loadEnd(tags) {
+        const container = document.getElementById('api-container');
+        if(!container || !tags) return;
+        
+        container.innerHTML = '';
+
+        for (const [cat, routes] of Object.entries(tags)) {
+            const section = document.createElement('div');
+            section.className = "api-section w-full";
+            
+            const catId = `cat-${cat.replace(/\s+/g, '-')}`;
+
+            const headerBtn = `
+                <button 
+                    onclick="toggleCategory('${catId}')" 
+                    class="w-full flex items-center justify-between bg-white text-primary p-4 rounded-lg shadow-hard border-2 border-primary mb-4 group hover:bg-gray-50 active:scale-[0.99] transition-all duration-150"
+                >
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-folder-open text-xl"></i>
+                        <h2 class="text-lg font-display font-bold uppercase tracking-wider">${cat}</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-mono bg-primary/10 border border-primary/20 px-2 py-1 rounded text-primary font-bold">${routes.length} EP</span>
+                        <i id="arrow-${catId}" class="cat-arrow fa-solid fa-chevron-down transition-transform duration-300"></i>
+                    </div>
+                </button>
+            `;
+
+            const grid = document.createElement('div');
+            grid.id = `grid-${catId}`;
+            grid.className = 'api-section-grid grid grid-cols-1 gap-4 hidden mb-8'; 
+
+            routes.forEach((route, idx) => {
+                const id = `${cat}-${idx}`.replace(/\s+/g, '-');
+                const searchTerms = `${route.name} ${route.endpoint} ${cat}`;
+                
+                let inputsHtml = '';
+                if (route.params?.length) {
+                    inputsHtml = `<div class="bg-gray-50 p-4 border-t-2 border-primary/20 grid gap-3">` + 
+                    route.params.map(p => 
+                        `<div class="relative">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-[10px] font-bold text-primary uppercase tracking-wider flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 bg-primary rounded-full inline-block"></span> ${p.name.toUpperCase()}
+                                </label>
+                                <span class="text-[9px] font-bold ${p.required ? 'text-red-500' : 'text-primary/60'}">${p.required ? 'REQ' : 'OPT'}</span>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="input-${id}-${p.name}" 
+                                placeholder="${p.description || 'Value...'}" 
+                                class="w-full border-2 border-primary/20 p-2 font-mono text-xs focus:border-primary focus:outline-none transition-colors rounded bg-white"
+                            >
+                         </div>`
+                    ).join('') + `</div>`;
+                }
+
+                const methodColor = route.method === 'GET' ? 'bg-sky-500' : 
+                                   route.method === 'POST' ? 'bg-green-500' :
+                                   route.method === 'DELETE' ? 'bg-red-500' : 'bg-orange-500';
+                
+                const card = document.createElement('div');
+                card.className = 'api-card-wrapper w-full bg-white border-2 border-primary/20 rounded-lg hover:border-primary transition-colors';
+                card.setAttribute('data-search', searchTerms);
+                
+                card.innerHTML = `
+                    <div class="p-3 cursor-pointer select-none" onclick="toggle('${id}')">
+                        <div class="flex justify-between items-center gap-3">
+                            <div class="flex items-center gap-2 overflow-hidden">
+                                <span class="px-1.5 py-0.5 text-[10px] font-bold text-white ${methodColor} rounded font-mono">${route.method}</span>
+                                <code class="font-bold text-xs sm:text-sm truncate font-mono text-slate-700">${route.endpoint}</code>
+                            </div>
+                            <i id="icon-${id}" class="fa-solid fa-plus text-xs text-primary transition-transform duration-300"></i>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2 font-mono truncate">${route.name}</p>
+                    </div>
+                    
+                    <div id="body-${id}" class="hidden animate-slide-down">
+                        ${inputsHtml}
+                        
+                        <div class="p-3 flex gap-2 border-t-2 border-primary/10 bg-gray-50/50">
+                            <button 
+                                id="btn-exec-${id}" 
+                                onclick="testReq(this, '${route.endpoint}', '${route.method}', '${id}')" 
+                                class="flex-1 bg-primary text-white font-bold py-2 hover:bg-violet-700 transition-colors shadow-hard-hover active:shadow-none active:translate-y-[2px] text-[10px] tracking-widest uppercase rounded border border-black min-w-[100px]"
+                            >
+                                Execute
+                            </button>
+                            <button 
+                                onclick="copy('${route.endpoint}')" 
+                                class="px-3 border border-primary/30 bg-white hover:bg-primary/5 rounded" 
+                                title="Copy URL"
+                            >
+                                <i class="fa-regular fa-copy text-primary text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div id="res-area-${id}" class="hidden border-t-4 border-primary/50 bg-slate-900 text-[11px] relative rounded-b-lg overflow-hidden shadow-inner">
+                            <div class="flex justify-between items-center bg-black/40 px-3 py-2 border-b border-white/10">
+                                <div class="flex gap-2 items-center">
+                                    <span class="w-2 h-2 rounded-full bg-yellow-400" id="status-dot-${id}"></span>
+                                    <span id="status-${id}" class="text-gray-400 font-bold font-mono">WAITING</span>
+                                </div>
+                                <span id="time-${id}" class="text-gray-500 font-mono text-[10px]">--ms</span>
+                            </div>
+                            
+                            <div class="absolute top-2 right-2 flex gap-1 z-20">
+                                 <a 
+                                    id="dl-btn-${id}" 
+                                    class="hidden bg-green-500/20 text-green-400 border border-green-500/50 px-2 py-0.5 hover:bg-green-500/30 rounded cursor-pointer transition-colors"
+                                 ><i class="fa-solid fa-download"></i></a>
+                                 <button 
+                                    onclick="copyRes('${id}')" 
+                                    class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-2 py-0.5 hover:bg-blue-500/30 rounded transition-colors"
+                                 ><i class="fa-regular fa-clone"></i></button>
+                                 <button 
+                                    onclick="reset('${id}')" 
+                                    class="bg-red-500/20 text-red-400 border border-red-500/50 px-2 py-0.5 hover:bg-red-500/30 rounded transition-colors"
+                                 ><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+
+                            <div 
+                                id="output-${id}" 
+                                class="font-mono text-[10px] overflow-x-auto whitespace-pre-wrap break-all max-h-[400px] p-4 custom-scrollbar min-h-[80px] text-gray-300 leading-relaxed"
+                            ></div>
+                        </div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+
+            section.innerHTML = headerBtn;
+            section.appendChild(grid);
+            container.appendChild(section);
+        }
+    }
+
+    window.toggle = (id) => {
+        const b = document.getElementById(`body-${id}`);
+        const i = document.getElementById(`icon-${id}`);
+        
+        if (b.classList.contains('hidden')) {
+            b.classList.remove('hidden');
+            i.classList.add('rotate-45'); 
+        } else {
+            b.classList.add('hidden');
+            i.classList.remove('rotate-45');
+        }
+    };
+
+    window.copy = (txt) => {
+        navigator.clipboard.writeText(window.location.origin + txt);
+        messeg("ENDPOINT COPIED");
+        terminalLog(`Copied URL: ${txt}`);
+    };
+
+    window.reset = (id) => {
+        document.getElementById(`res-area-${id}`).classList.add('hidden');
+        document.getElementById(`output-${id}`).innerHTML = '';
+        const dlBtn = document.getElementById(`dl-btn-${id}`);
+        if(dlBtn) dlBtn.classList.add('hidden');
+        document.querySelectorAll(`[id^="input-${id}-"]`).forEach(i => i.value = '');
+        terminalLog(`Console cleared for req-${id.split('-').pop()}`);
+    };
+
+    window.testReq = async (btn, url, method, id) => {
+        if (btn.disabled) return;
+
+        const out = document.getElementById(`output-${id}`);
+        const status = document.getElementById(`status-${id}`);
+        const statusDot = document.getElementById(`status-dot-${id}`);
+        const time = document.getElementById(`time-${id}`);
+        const dlBtn = document.getElementById(`dl-btn-${id}`);
+        
+        const originalBtnText = 'Execute';
+        
+        btn.disabled = true;
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        
+        let startTime = Date.now();
+        let timerInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            btn.innerHTML = `<span class="font-mono">${elapsed}ms...</span>`;
+        }, 75);
+        
+        document.getElementById(`res-area-${id}`).classList.remove('hidden');
+        
+        if(dlBtn) {
+            dlBtn.classList.add('hidden');
+            dlBtn.href = '#';
+        }
+        
+        status.innerText = 'PROCESSING...';
+        status.className = 'text-yellow-400 font-bold font-mono';
+        statusDot.className = 'w-2 h-2 rounded-full bg-yellow-400';
+
+        out.innerHTML = '<span class="text-gray-500 italic">executing...</span>';
+        
+        const params = {};
+        document.querySelectorAll(`[id^="input-${id}-"]`).forEach(i => {
+            if(i.value) params[i.id.split(`input-${id}-`)[1]] = i.value;
+        });
+
+        let fetchUrl = url + (method === 'GET' && Object.keys(params).length ? '?' + new URLSearchParams(params) : '');
+        let opts = { method, ...(method !== 'GET' ? { headers: {'Content-Type': 'application/json'}, body: JSON.stringify(params) } : {}) };
+
+        const fullUrl = fetchUrl.startsWith('http') ? fetchUrl : window.location.origin + fetchUrl;
+
+        try {
+            const req = await fetch(fetchUrl, opts);
+            
+            clearInterval(timerInterval);
+            const duration = (Date.now() - startTime); 
+            
+            status.innerText = `${req.status} ${req.statusText}`;
+            status.className = req.ok ? 'text-green-400 font-bold font-mono' : 'text-red-400 font-bold font-mono';
+            statusDot.className = req.ok ? 'w-2 h-2 rounded-full bg-green-400' : 'w-2 h-2 rounded-full bg-red-400';
+            time.innerText = `${duration}ms`;
+
+            terminalLog(`[${req.status}] ${fullUrl} (${duration}ms)`, req.ok ? 'req-success' : 'req-error');
+
+            const type = req.headers.get('content-type');
+            if (type?.includes('json')) {
+                const json = await req.json();
+                out.innerHTML = syntaxHighlight(json);
+            } else if (type?.startsWith('image')) {
+                const blob = await req.blob();
+                const urlObj = URL.createObjectURL(blob);
+                if(dlBtn) {
+                    dlBtn.href = urlObj;
+                    dlBtn.download = `img-${Date.now()}.jpg`;
+                    dlBtn.classList.remove('hidden');
+                }
+                
+                out.innerHTML = `
+                    <div class="border border-dashed border-gray-600 p-4 bg-black/20 rounded-lg flex justify-center">
+                        <img src="${urlObj}" class="max-w-full shadow-lg max-h-[400px] rounded border border-gray-700">
+                    </div>`;
+            } else if (type?.includes('audio')) {
+                const blob = await req.blob();
+                 out.innerHTML = `<audio controls src="${URL.createObjectURL(blob)}" class="w-full mt-2 rounded"></audio>`;
+            } else {
+                out.innerText = await req.text();
+            }
+        } catch (err) {
+            clearInterval(timerInterval);
+            out.innerHTML = `<span class="text-red-400 font-bold">CONNECTION_REFUSED</span><br><span class="text-gray-500">${err.message}</span>`;
+            status.innerText = 'ERR';
+            statusDot.className = 'w-2 h-2 rounded-full bg-red-500';
+            status.className = 'text-red-400 font-bold font-mono';
+            terminalLog(`Fetch Failed: ${err.message}`, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnText;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+    };
+
+    function syntaxHighlight(json) {
+        if (typeof json != 'string') json = JSON.stringify(json, undefined, 2);
+        return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            let cls = 'json-number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) cls = 'json-key';
+                else cls = 'json-string';
+            } else if (/true|false/.test(match)) {
+                cls = 'json-boolean';
+            } else if (/null/.test(match)) {
+                cls = 'json-null';
+            }
+            return `<span class="${cls}">${match}</span>`;
+        });
+    }
+
+    window.toggleCategory = (catId) => {
+        const grid = document.getElementById(`grid-${catId}`);
+        const arrow = document.getElementById(`arrow-${catId}`);
+        
+        if(grid.classList.contains('hidden')) {
+            grid.classList.remove('hidden');
+            arrow.classList.add('rotate-180');
+        } else {
+            grid.classList.add('hidden');
+            arrow.classList.remove('rotate-180');
+        }
+    };
+
+    window.copyRes = (id) => {
+        const out = document.getElementById(`output-${id}`);
+        if (!out.innerText) return;
+        navigator.clipboard.writeText(out.innerText);
+        messeg("RESPONSE COPIED");
+    };
+
+</script>
+
+<script>
+    function createStars() {
+        const sc = document.getElementById('stars-container');
+        if (!sc) return;
+        sc.style.display = 'block';
+        sc.innerHTML = ''; 
+        
+        const starCount = 80; 
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+            
+            const size = Math.random() * 2 + 0.5; 
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            
+            star.style.animationDuration = (2 + Math.random() * 4) + 's';
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            
+            sc.appendChild(star);
+        }
+    }
+
+    function removeStars() {
+        const sc = document.getElementById('stars-container');
+        if(sc) {
+            sc.style.display = 'none';
+            sc.innerHTML = '';
+        }
+    }
+
+    function fallingFlower() {
+        const container = document.getElementById('falling-flowers-container');
+
+        const imgs = [ 
+            'https://c.termai.cc/i193/Zuhw5.png',
+            'https://c.termai.cc/i151/ScGW.png',
+            'https://c.termai.cc/i156/QVY3n.png'
+        ];
+        
+        function createFlower() {
+            if(document.body.classList.contains('galaxy-theme')) return; 
+            
+            const wrapper = document.createElement('div');
+            const flower = document.createElement('div');
+            wrapper.className = 'falling-flower-wrapper';
+            flower.className = 'falling-flower';
+            const size = 15 + Math.random() * 15; 
+            
+            wrapper.style.width = size + 'px';
+            wrapper.style.height = size + 'px';
+            wrapper.style.left = Math.random() * 100 + 'vw';
+            wrapper.style.animationDuration = (8 + Math.random() * 7) + 's';
+            flower.style.animationDuration = (3 + Math.random() * 3) + 's';
+
+            flower.style.backgroundImage = `url('${imgs[Math.floor(Math.random() * imgs.length)]}')`;
+            wrapper.appendChild(flower);
+            container.appendChild(wrapper);
+
+            setTimeout(() => wrapper.remove(), 15000);
+        }
+        setInterval(createFlower, 900);
+    }
+    document.addEventListener('DOMContentLoaded', fallingFlower);
+
+    function toggleGalaxyTheme() {
+        document.body.classList.toggle('galaxy-theme');
+        const isDark = document.body.classList.contains('galaxy-theme');
+        localStorage.setItem('theme', isDark ? 'galaxy' : 'light');
+        
+        const toggleIcon = document.querySelector('#themeToggle i');
+        const flowersContainer = document.getElementById('falling-flowers-container');
+
+        if(isDark) {
+            toggleIcon.className = 'fa-solid fa-sun text-lg text-yellow-500';
+            flowersContainer.style.display = 'none';
+            createStars();
+        } else {
+            toggleIcon.className = 'fa-solid fa-moon text-lg text-primary';
+            flowersContainer.style.display = 'block';
+            removeStars();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if(localStorage.getItem('theme') === 'galaxy') {
+            document.body.classList.add('galaxy-theme');
+            const toggleIcon = document.querySelector('#themeToggle i');
+            
+            if(toggleIcon) toggleIcon.className = 'fa-solid fa-sun text-lg text-yellow-500';
+            
+            document.getElementById('falling-flowers-container').style.display = 'none';
+            createStars();
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const musicWidget = document.getElementById('music-widget');
+        const musicToggle = document.getElementById('music-toggle');
+        const audioPlayer = document.getElementById('audio-player');
+        const btnPlay = document.getElementById('btn-play');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+        const coverImage = document.querySelector('#music-cover-container img');
+        const titleElement = document.querySelector('.marquee-container p');
+
+       
+        if (coverImage) coverImage.style.animationPlayState = 'paused';
+
+        let playlist = [];
+        let currentSongIndex = 0;
+
+     
+        fetch('lagu.json')
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    playlist = data;
+                    loadSong(currentSongIndex);
+                }
+            })
+            .catch(err => {
+                console.warn('Gagal memuat lagu.json, pastikan file tersedia. Menggunakan fallback bawaan.');
+               
+                playlist = [{
+                    judul: "BIRDS OF A FEATHER - Billie Eilish",
+                    url: "https://c.termai.cc/a117/UMQi.mp3"
+                }];
+                loadSong(0);
+            });
+
+        function loadSong(index) {
+            if (!playlist[index]) return;
+            const song = playlist[index];
+            if (titleElement) titleElement.innerText = song.judul;
+            if (audioPlayer) audioPlayer.src = song.url;
+            
+          
+            if (btnPlay) {
+                const icon = btnPlay.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-play ml-1';
+            }
+            if (coverImage) coverImage.style.animationPlayState = 'paused';
+        }
+
+        function playSong() {
+            if (audioPlayer) {
+                audioPlayer.play();
+                const icon = btnPlay.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-pause';
+                if (coverImage) coverImage.style.animationPlayState = 'running';
+            }
+        }
+
+        function pauseSong() {
+            if (audioPlayer) {
+                audioPlayer.pause();
+                const icon = btnPlay.querySelector('i');
+                if (icon) icon.className = 'fa-solid fa-play ml-1';
+                if (coverImage) coverImage.style.animationPlayState = 'paused';
+            }
+        }
+
+        if (musicToggle && musicWidget) {
+            musicToggle.addEventListener('click', () => {
+                musicWidget.classList.toggle('music-open');
+            });
+        }
+
+        if (btnPlay && audioPlayer) {
+            btnPlay.addEventListener('click', () => {
+                if (audioPlayer.paused) {
+                    playSong();
+                } else {
+                    pauseSong();
+                }
+            });
+        }
+
+        if (btnPrev && audioPlayer) {
+            btnPrev.addEventListener('click', () => {
+                currentSongIndex--;
+                if (currentSongIndex < 0) currentSongIndex = playlist.length - 1;
+                loadSong(currentSongIndex);
+                playSong();
+            });
+        }
+
+        if (btnNext && audioPlayer) {
+            btnNext.addEventListener('click', () => {
+                currentSongIndex++;
+                if (currentSongIndex > playlist.length - 1) currentSongIndex = 0;
+                loadSong(currentSongIndex);
+                playSong();
+            });
+        }
+
+        if (audioPlayer) {
+            audioPlayer.addEventListener('ended', () => {
+                currentSongIndex++;
+                if (currentSongIndex > playlist.length - 1) currentSongIndex = 0;
+                loadSong(currentSongIndex);
+                playSong();
+            });
+        }
+
+        if (audioPlayer && progressBar) {
+            audioPlayer.addEventListener('timeupdate', () => {
+                if(audioPlayer.duration) {
+                    const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                    progressBar.style.width = `${progressPercent}%`;
+                }
+            });
+        }
+
+        if (progressContainer && audioPlayer) {
+            progressContainer.addEventListener('click', (e) => {
+                const width = progressContainer.clientWidth;
+                const clickX = e.offsetX;
+                const duration = audioPlayer.duration;
+                if(duration) {
+                    audioPlayer.currentTime = (clickX / width) * duration;
+                }
+            });
+        }
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
