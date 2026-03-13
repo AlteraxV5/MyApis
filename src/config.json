@@ -45,11 +45,6 @@
             "name": "prompt",
             "required": true,
             "description": "Question / Prompt"
-          },
-          {
-            "name": "apiKey",
-            "required": true,
-            "description": "NanoBanana Pro API Key (3rd Party)"
           }
         ]
       }
