@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASHBOARD - STATUS X-API</title>
+    <link id="favicon" rel="icon" href="/src/AltOffx.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;700;800&display=swap">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { mono: ['"JetBrains Mono"', 'monospace'], display: ['"Space Mono"', 'monospace'] },
+                    colors: { primary: '#8b5cf6', 'sky-blue': '#38bdf8', 'term-bg': '#1e1e1e' },
+                    boxShadow: { 'hard': '4px 4px 0px 0px #8b5cf6', 'hard-hover': '2px 2px 0px 0px #8b5cf6' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { transition: background-color 0.5s ease, color 0.5s ease; overflow-x: hidden; }
+        #fixed-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -50;
+            background-image: url('https://c.termai.cc/i181/aGwK.png'), url('https://c.termai.cc/i155/wbV.jpg');
+            background-position: bottom right, center center; background-size: 85% auto, cover; background-repeat: no-repeat;
+        }
+        .backdrop-overlay { background-color: rgba(255, 255, 255, 0.6); position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -40; transition: background-color 0.5s ease; }
+        
+        /* GALAXY THEME OVERRIDES */
+        body.galaxy-theme { background-color: #050508; color: #e2e8f0; }
+        body.galaxy-theme #fixed-bg {
+            background-image: none !important;
+            background: radial-gradient(circle at 15% 50%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
+            filter: blur(40px);
+        }
+        body.galaxy-theme .backdrop-overlay { background-color: rgba(5, 5, 8, 0.85); backdrop-filter: blur(4px); }
+        body.galaxy-theme nav, body.galaxy-theme .bg-white {
+            background-color: rgba(15, 15, 22, 0.85) !important;
+            border-color: rgba(168, 85, 247, 0.4) !important;
+            color: #f8fafc !important;
+        }
+        body.galaxy-theme .text-slate-800 { color: #cbd5e1 !important; }
+        body.galaxy-theme #sidebar { background-color: rgba(15, 15, 22, 0.95) !important; border-color: #a855f7 !important; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen font-mono relative">
+    <div id="fixed-bg"></div>
+    <div class="backdrop-overlay"></div>
+
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-[80] hidden opacity-0 transition-opacity duration-300"></div>
+
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white border-r-2 border-primary transform -translate-x-full transition-transform duration-300 z-[90] flex flex-col shadow-[4px_0px_0px_0px_#8b5cf6]">
+        <div class="h-16 border-b-2 border-primary flex items-center justify-between px-4">
+            <h2 class="font-display font-bold text-xl italic text-primary">MENU</h2>
+            <button onclick="toggleSidebar()" class="text-2xl text-primary hover:text-red-500 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex-1 flex flex-col gap-3 p-4">
+            <a href="/admin" class="px-4 py-3 border-2 border-primary/20 rounded font-bold text-primary hover:bg-primary/10 hover:border-primary transition-all flex items-center gap-3">
+                <i class="fas fa-book w-5 text-center"></i> APIKEY
+            </a>
+        </div>
+    </div>
+
+    <nav class="border-b-2 border-primary bg-white/90 sticky top-0 z-[60]">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="w-10 h-10 bg-primary text-white flex items-center justify-center font-bold text-xl shadow-hard border-2 border-black hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="font-display font-bold text-xl tracking-tighter uppercase italic text-primary">DASHBOARD</h1>
+            </div>
+            <div class="flex items-center gap-2 text-green-500 font-bold text-sm bg-green-500/10 border-2 border-green-500/50 px-3 py-1 rounded-full shadow-hard bg-white">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"></div> SERVER LIVE
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 relative z-10">
+        
+        <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg mb-8">
+            <h2 class="text-xl font-display font-bold text-primary flex items-center gap-2 italic mb-6 border-b-2 border-primary/20 pb-4">
+                <i class="fas fa-server"></i> UPTIME INFORMATION
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-center gap-4 bg-primary/5 p-4 border-2 border-primary/20 rounded-lg">
+                    <div class="w-12 h-12 bg-primary text-white flex justify-center items-center rounded text-2xl border-2 border-primary">
+                        <i class="fas fa-stopwatch"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Process Uptime</div>
+                        <div id="processUptime" class="text-lg font-bold text-primary font-display">Loading...</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 bg-sky-blue/5 p-4 border-2 border-sky-blue/20 rounded-lg">
+                    <div class="w-12 h-12 bg-sky-blue text-white flex justify-center items-center rounded text-2xl border-2 border-sky-blue">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">System Uptime</div>
+                        <div id="systemUptime" class="text-lg font-bold text-sky-blue font-display">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg hover:-translate-y-1 transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex justify-center items-center text-xl border-2 border-primary/30">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-primary font-display mb-1" id="totalHit">0</div>
+                <div class="text-xs font-bold text-slate-500 uppercase">Total Hit Request</div>
+            </div>
+
+            <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg hover:-translate-y-1 transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex justify-center items-center text-xl border-2 border-primary/30">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-primary font-display mb-1" id="todayHit">0</div>
+                <div class="text-xs font-bold text-slate-500 uppercase">Today Hit</div>
+            </div>
+
+            <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg hover:-translate-y-1 transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex justify-center items-center text-xl border-2 border-primary/30">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-primary font-display mb-1" id="totalUser">0</div>
+                <div class="text-xs font-bold text-slate-500 uppercase">Total Users</div>
+            </div>
+
+            <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg hover:-translate-y-1 transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex justify-center items-center text-xl border-2 border-primary/30">
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-primary font-display mb-1" id="totalApiKey">0</div>
+                <div class="text-xs font-bold text-slate-500 uppercase">Registered API Keys</div>
+            </div>
+
+            <div class="bg-white border-2 border-primary p-6 shadow-hard rounded-lg hover:-translate-y-1 transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex justify-center items-center text-xl border-2 border-primary/30">
+                        <i class="fas fa-route"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-primary font-display mb-1" id="routerActive">0/0</div>
+                <div class="text-xs font-bold text-slate-500 uppercase">Active Routers</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+      
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+       
+        function applyTheme() {
+            const theme = localStorage.getItem('theme');
+            if(theme === 'galaxy') {
+                document.body.classList.add('galaxy-theme');
+            } else {
+                document.body.classList.remove('galaxy-theme');
+            }
+        }
+        window.addEventListener('storage', (e) => { if (e.key === 'theme') applyTheme(); });
+
+    
+        async function fetchServerStatus() {
+            try {
+               
+                const response = await fetch('/admin/server-status');
+                const data = await response.json();
+                
+              
+                document.getElementById('processUptime').innerText = data.processUptime || 'N/A';
+                document.getElementById('systemUptime').innerText = data.systemUptime || 'N/A';
+                
+               
+                if(data.totalHit !== undefined) document.getElementById('totalHit').innerText = data.totalHit;
+                if(data.todayHit !== undefined) document.getElementById('todayHit').innerText = data.todayHit;
+                if(data.totalUser !== undefined) document.getElementById('totalUser').innerText = data.totalUser;
+                if(data.totalApiKey !== undefined) document.getElementById('totalApiKey').innerText = data.totalApiKey;
+                if(data.routerActive !== undefined) document.getElementById('routerActive').innerText = data.routerActive;
+                
+            } catch (error) {
+                console.error('Failed to fetch realtime status', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+            fetchServerStatus();
+          
+            setInterval(fetchServerStatus, 5000);
+        });
+    </script>
+</body>
+</html>
