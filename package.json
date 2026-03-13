@@ -1,12 +1,12 @@
 {
   "name": "AltOffx",
-  "version": "3.5.0",
+  "version": "1.0.0",
   "description": "",
   "main": "script.js",
   "scripts": {
     "clean": "rm -rf package-lock.json",
     "prebuild": "npm run clean",
-    "start": "-"
+    "start": "node script.js"
   },
   "author": "AltOffx ( Development )",
   "license": "ISC",
@@ -15,6 +15,7 @@
     "axios-cookiejar-support": "^5.0.0",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
+    "mongoose": "8.23.0", 
     "crypto": "^1.0.1",
     "crypto-js": "^4.2.0",
     "express": "^4.22.1",
