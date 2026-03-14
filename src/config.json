@@ -264,4 +264,19 @@
       }
     ]
   }
-}
+},
+"stalk": [
+      {
+        "name": "Instagram Stalk",
+        "endpoint": "/api/stalk/ig",
+        "filename": "igstalk",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Query"
+          }
+        ]
+      }
+    ]
