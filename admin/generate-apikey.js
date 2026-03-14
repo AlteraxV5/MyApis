@@ -3,7 +3,7 @@ const { checkAdmin } = require('./list/admin');
 
 const GIST_ID = 'fb7b7674dcd6eae7982596f277c694cd'; 
 const GITHUB_TOKEN = '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';
-const FILE_NAME = 'X-Keys.json';
+const FILE_NAME = 'X-Keyss.json';
 
 const getGistData = async () => {
     try {
