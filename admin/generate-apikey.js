@@ -26,7 +26,10 @@ const updateGistLimit = async (newContent) => {
     await axios.patch(`https://api.github.com/gists/${GIST_ID}`, {
         files: { [FILE_NAME]: { content: JSON.stringify(newContent, null, 2) } }
     }, {
-        headers: { Authorization: `Bearer ${GITHUB_TOKEN}` }
+        headers: {
+  Authorization: `Bearer ${GITHUB_TOKEN}`,
+  Accept: "application/vnd.github+json"
+        }
     });
 };
 
