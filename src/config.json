@@ -271,7 +271,7 @@
         "method": "GET",
         "params": [
           {
-            "name": "q",
+            "name": "username",
             "required": true,
             "description": "Query"
           }
