@@ -2,8 +2,8 @@ const axios = require('axios');
 const { checkAdmin } = require('./list/admin');
 
 const GIST_ID = 'fb7b7674dcd6eae7982596f277c694cd'; 
-const GITHUB_TOKEN = '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';
-const FILE_NAME = 'database.json';
+const GITHUB_TOKEN = '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';
+const FILE_NAME = 'X-Keys.json';
 
 const getGistData = async () => {
     try {
