@@ -138,10 +138,23 @@
           }
         ]
       },
+        {
+        "name": "Youtube Downloader MP3 V2",
+        "endpoint": "/api/download/ytmp3v2",
+        "filename": "ytv2mp3",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true,
+            "description": "Youtube URL"
+          }
+        ]
+      },
       {
         "name": "Youtube Downloader Mp3/Mp4",
-        "endpoint": "/api/download/ytdl",
-        "filename": "ytdl",
+        "endpoint": "/api/download/ytdlv2",
+        "filename": "ytdlv2",
         "method": "GET",
         "params": [
           {
