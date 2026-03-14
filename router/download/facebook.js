@@ -49,9 +49,12 @@ async function facebookDl(url) {
 
         const $ = cheerio.load(data);
 
-        if ($('.alert-danger').length > 0) {
-            throw new Error("Video private atau URL tidak valid");
-        }
+        const sdLink = $('#sdlink').attr('href');
+const hdLink = $('#hdlink').attr('href');
+
+if (!sdLink && !hdLink) {
+    throw new Error("Link download tidak ditemukan (mungkin private / format tidak didukung)");
+}
 
         const title = $('.lib-row.lib-header').text().trim() || "Facebook Video";
         const description = $('.lib-row.lib-desc').text().trim() || "No Description";
