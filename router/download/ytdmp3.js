@@ -54,16 +54,14 @@ async function info(cdn, id) {
   return decrypt(res.data.data)
 }
 
-async function convert(cdn, id, type, key) {
-
-  const isAudio = type === "mp3"
+async function convert(cdn, id, key) {
 
   const res = await axios.post(
     `https://${cdn}/download`,
     {
       id,
-      downloadType: isAudio ? "audio" : "video",
-      quality: isAudio ? "128" : "720",
+      downloadType: "audio",
+      quality: "128",
       key
     },
     { headers }
@@ -72,17 +70,9 @@ async function convert(cdn, id, type, key) {
   return res.data.data
 }
 
-module.exports = async function SaveTubeHandler(req, res) {
+module.exports = async function SaveTubeAudioHandler(req, res) {
 
   const url = req.query.url || req.body.url
-  let type = (req.query.type || req.body.type || "mp3").toLowerCase()
-
-  if (!["mp3","mp4"].includes(type)) {
-    return res.status(400).json({
-      status: false,
-      message: "Type hanya mendukung mp3 atau mp4"
-    })
-  }
 
   if (!url)
     return res.status(400).json({
@@ -101,7 +91,6 @@ module.exports = async function SaveTubeHandler(req, res) {
     const convertdata = await convert(
       cdn,
       id,
-      type,
       infodata.key
     )
 
@@ -110,7 +99,7 @@ module.exports = async function SaveTubeHandler(req, res) {
       status: true,
       id,
       title: infodata.title,
-      type,
+      type: "mp3",
       download: convertdata.downloadUrl
     })
 
