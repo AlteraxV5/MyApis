@@ -7,7 +7,15 @@ const FILE_NAME = 'X-Keyss.json';
 
 const getGistData = async () => {
     try {
-        const res = await axios.get(`https://api.github.com/gists/${GIST_ID}?_t=${Date.now()}`);
+        const res = await axios.get(
+  `https://api.github.com/gists/${GIST_ID}?_t=${Date.now()}`,
+  {
+    headers: {
+      Authorization: `Bearer ${GITHUB_TOKEN}`,
+      Accept: "application/vnd.github+json"
+    }
+  }
+);
         return JSON.parse(res.data.files[FILE_NAME].content);
     } catch (err) {
         return { keys: [] }; 
