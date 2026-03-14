@@ -3,6 +3,7 @@ const fetch = require('node-fetch')
 module.exports = async function handler(req, res) {
 
   const url = req.query?.url || req.body?.url
+  const type = (req.query?.type || 'mp4').toLowerCase()
 
   if (!url) {
     return res.status(400).json({
@@ -37,64 +38,31 @@ module.exports = async function handler(req, res) {
     const audios = mediaItems.filter(v => v.type === 'Audio')
 
     const bestVideo = videos[0]
-    const bestAudio = audios[0] || null
+    const bestAudio = audios[0]
 
-    const getDownload = async (mediaUrl) => {
+    const target = type === "mp3" ? bestAudio : bestVideo
 
-      const step2 = await fetch('https://app.ytdown.to/proxy.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Origin': 'https://app.ytdown.to',
-          'Referer': 'https://app.ytdown.to/id2/'
-        },
-        body: `url=${encodeURIComponent(mediaUrl)}`
-      })
+    const step2 = await fetch('https://app.ytdown.to/proxy.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Origin': 'https://app.ytdown.to',
+        'Referer': 'https://app.ytdown.to/id2/'
+      },
+      body: `url=${encodeURIComponent(target.mediaUrl)}`
+    })
 
-      let data = await step2.json()
-      let attempts = 0
-
-      while (data.api.status === 'queued' && attempts < 20) {
-
-        await new Promise(r => setTimeout(r, 2000))
-
-        const poll = await fetch('https://app.ytdown.to/proxy.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Origin': 'https://app.ytdown.to',
-            'Referer': 'https://app.ytdown.to/id2/'
-          },
-          body: `url=${encodeURIComponent(mediaUrl)}`
-        })
-
-        data = await poll.json()
-        attempts++
-
-      }
-
-      if (data.api.status !== 'completed') {
-        throw new Error('Download timeout')
-      }
-
-      return {
-        url: data.api.fileUrl,
-        filename: data.api.fileName,
-        size: data.api.fileSize
-      }
-
-    }
-
-    const video = await getDownload(bestVideo.mediaUrl)
-    const audio = bestAudio ? await getDownload(bestAudio.mediaUrl) : null
+    const data = await step2.json()
 
     res.json({
       status: true,
       creator: "AltOffx",
       result: {
         title,
-        video,
-        audio
+        type,
+        url: data.api.fileUrl,
+        filename: data.api.fileName,
+        size: data.api.fileSize
       }
     })
 
