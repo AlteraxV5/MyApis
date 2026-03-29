@@ -31,6 +31,24 @@
         ]
       },
       {
+        "name": "WORM-GPT",
+        "endpoint": "/api/ai/wormpgpt",
+        "filename": "wormGPT",
+        "method": "GET",
+        "params": [
+          {
+            "name": "q",
+            "required": true,
+            "description": "Question"
+          },
+          {
+            "name": "session",
+            "required": false,
+            "description": "Session ID"
+          }
+        ]
+      },
+      {
         "name": "NanoBanana Pro",
         "endpoint": "/api/ai/nanobanana",
         "filename": "NanoBananaPro",
