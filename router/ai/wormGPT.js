@@ -34,7 +34,10 @@ async function wrmgpt(prompt) {
     })
   });
 
-  if (!res.ok) throw new Error("API_FAIL");
+  if (!res.ok) {
+  const text = await res.text();
+  throw new Error(`API_FAIL: ${res.status} | ${text}`);
+}
 
   const raw = await res.text();
   let output = "";
