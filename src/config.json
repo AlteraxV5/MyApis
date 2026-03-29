@@ -37,9 +37,9 @@
         "method": "GET",
         "params": [
           {
-            "name": "q",
+            "name": "message",
             "required": true,
-            "description": "Question"
+            "description": "message"
           },
           {
             "name": "session",
