@@ -34,7 +34,7 @@
         "name": "WORM-GPT",
         "endpoint": "/api/ai/wormpgpt",
         "filename": "wormGPT",
-        "method": "GET",
+        "method": "Eror",
         "params": [
           {
             "name": "message",
@@ -52,7 +52,7 @@
         "name": "NanoBanana Pro",
         "endpoint": "/api/ai/nanobanana",
         "filename": "NanoBananaPro",
-        "method": "POST",
+        "method": "Eror",
         "params": [
           {
             "name": "imagePath",
