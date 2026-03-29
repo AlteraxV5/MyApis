@@ -5,7 +5,7 @@ const rand = n =>
     "abcdefghijklmnopqrstuvwxyz0123456789"[Math.floor(Math.random() * 36)]
   ).join("");
 
-const COOKIE = "REDACTED";
+const COOKIE = "__Secure-next-auth.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiRnlESjQ1UXFQeDVRSVhoaVNSQk5uNFBHcFBFVnQzbjBZTVhRVGlEZ3hNeS1KaEZCNTJQOWx6d0lvNTRIODU1X3JNVzhWTHE0UUVDUExTWF9aLTh2aXcifQ..R86u_SUOJUp4X5V8zKS4ug.Qub3YVJYE0xWIK7DogGAB7xxu6cVmjxR7MOj8mQBVy-1Lb7KmW9dC22easmcEBFfQN6OBF8goJlYla5wLEhUtJbl_Iv_3_diuLiyMnEv6jClBbCXPrIIe_uaW9MNgtTnZVDN-jlo0YAbglQmosvKryjV203dBYZ0AVkfYLu7A2fCGE4JUvC3q94q4XLeHqdQhXVuDPanaXikiqCMdaqGIrCr6prqY6CktXhhGclz6rW8cnap1O3CszoFgQk4jhMBmPfwv43_E-vMf0C32JbY6EGplJWItfMiBHJYL1Z86A1HvQqBgGHSBmgv8W91JBCJQgMuWTDxJPma0SXN3pB7M626saAcA4aYEm3FhoV7620jjjYkN-mUuu3sEI2VOI5b_PKDDzUSKGQWHmjhxuqXFxJAdsSwwq5yTbPZrmryypr1lhxrJb4GoChH6pzgkhnW8n5GhmD25uP8V-7BNFj5KQ.lQFYH-u1t1hAozOax3dPp5r8xBlpV4jyaRWqHrttAWw";
 
 async function wrmgpt(prompt) {
   const msgId = `${rand(8)}-${rand(4)}-${rand(4)}-${rand(4)}-${rand(12)}`;
