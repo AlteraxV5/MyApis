@@ -288,6 +288,46 @@ app.post('/api/create-payment', async (req, res) => {
   }
 });
 
+app.get('/api/key-info', async (req, res) => {
+    const userKey = req.query.apikey || req.headers['x-api-key'];
+
+    if (!userKey) {
+        return res.status(400).json({
+            status: false,
+            creator: config.settings.creator,
+            message: "Masukkan apikey di query ?apikey=your_key"
+        });
+    }
+
+    try {
+        const dbKeys = await getGistData();
+        const keyData = dbKeys.keys.find(k => k.apikey === userKey);
+
+        if (!keyData) {
+            return res.status(404).json({
+                status: false,
+                creator: config.settings.creator,
+                message: "Apikey tidak ditemukan!"
+            });
+        }
+
+        const isUnlimited = keyData.role === 'unlimited' || keyData.limit === -1;
+
+        return res.json({
+            status: true,
+            creator: config.settings.creator,
+            info: {
+                role: keyData.role,
+                limit: isUnlimited ? '∞' : keyData.limit,
+                used: isUnlimited ? '∞' : (keyData.limit - keyData.limit), // tidak ditrack di sistem ini
+                unlimited: isUnlimited
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ status: false, message: "Gagal mengambil data key." });
+    }
+});
+
 app.use(checkApiKey);
 
 loadRouter(app, config);
