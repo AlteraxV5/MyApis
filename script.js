@@ -29,7 +29,6 @@ const initVisitorData = async () => {
         let today = new Date().toISOString().split('T')[0];
         
         if (dbData.visitors) {
-      
             if (dbData.visitors.date !== today) {
                 dbData.visitors.todayCount = 0;
                 dbData.visitors.date = today;
@@ -37,7 +36,6 @@ const initVisitorData = async () => {
             }
             localVisitorCache = dbData.visitors;
         } else {
-        
             dbData.visitors = localVisitorCache;
             await updateGistLimit(dbData);
         }
@@ -54,7 +52,6 @@ const incrementVisitor = () => {
     try {
         let today = new Date().toISOString().split('T')[0];
         
-       
         if (localVisitorCache.date !== today) {
             localVisitorCache.todayCount = 0;
             localVisitorCache.date = today;
@@ -63,7 +60,6 @@ const incrementVisitor = () => {
         localVisitorCache.count += 1;
         localVisitorCache.todayCount += 1;
         
-     
         getGistData().then(async (dbData) => {
             dbData.visitors = localVisitorCache;
             await updateGistLimit(dbData);
@@ -89,6 +85,10 @@ if (!configPath) {
 
 let config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
+// ================================================================
+// [FIX] checkApiKey — unlimited key (role: "unlimited" atau limit: -1)
+// tidak akan kena pengecekan limit dan tidak akan dikurangi.
+// ================================================================
 const checkApiKey = async (req, res, next) => {
     if (!req.path.startsWith('/api/')) return next();
     if (req.path === '/api/create-payment') return next();
@@ -117,16 +117,23 @@ const checkApiKey = async (req, res, next) => {
 
         const keyData = dbKeys.keys[keyIndex];
 
-        if (keyData.role === "premium") {
+        // [FIX] Cek apakah key unlimited (role unlimited ATAU limit -1)
+        const isUnlimited = keyData.role === 'unlimited' || keyData.limit === -1;
+
+        if (!isUnlimited) {
             if (keyData.limit <= 0) {
-                return res.status(429).json({ status: false, message: "Limit Apikey anda telah habis!" });
+                return res.status(429).json({ 
+                    status: false, 
+                    creator: config.settings.creator,
+                    message: "Limit Apikey anda telah habis!" 
+                });
             }
+            // Kurangi limit hanya untuk key premium/non-unlimited
             dbKeys.keys[keyIndex].limit -= 1;
             await updateGistLimit(dbKeys);
         }
 
         incrementVisitor();
-
         next();
     } catch (error) {
         console.error("Gist Auth Error:", error);
@@ -182,7 +189,6 @@ app.get('/admin/server-status', async (req, res) => {
         totalApikey = 0;
     }
 
- 
     let totalRoutes = 0;
     if (config && config.tags) {
         Object.values(config.tags).forEach(arr => {
@@ -292,7 +298,6 @@ app.get('/config', (req, res) => {
     currentConfig.settings.visitors = visit().toString();
     currentConfig.qris_configured = isStaticQrisConfigured();
 
-    
     for (const category in currentConfig.tags) {
       currentConfig.tags[category].forEach(api => {
         const hasApiKey = api.params && api.params.some(p => p.name.toLowerCase() === 'apikey');
