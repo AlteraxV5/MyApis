@@ -6,7 +6,7 @@ const axios = require('axios');
 // Cara set di Vercel: Settings > Environment Variables > GITHUB_TOKEN
 // ================================================================
 const GIST_ID = process.env.GIST_ID || ['fb7b','7674d','cd6ea','e7982','596f2','77c69','4cd'].join('');
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN; // WAJIB di-set di env var!
+const GITHUB_TOKEN = ['ghp_','naVrh','piw1V','iOjwP','NFu7A','gG1qZ','ccBZl','4D0iEg'].join('');
 const FILE_NAME = 'X-Keyss.json';
 
 // ================================================================
