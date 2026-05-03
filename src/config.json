@@ -147,7 +147,7 @@
         "name": "Youtube Downloader MP3",
         "endpoint": "/api/download/ytmp3",
         "filename": "ytmp3",
-        "method": "GET",
+        "method": "Eror",
         "params": [
           {
             "name": "url",
