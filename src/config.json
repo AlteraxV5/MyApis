@@ -230,7 +230,7 @@
         "name": "Play Downloader",
         "endpoint": "/api/search/play",
         "filename": "play",
-        "method": "GET",
+        "method": "Eror",
         "params": [
           {
             "name": "q",
