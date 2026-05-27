@@ -19,10 +19,6 @@ const GIST_ID = process.env.GIST_ID || ['fb7b','7674d','cd6ea','e7982','596f2','
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || ['ghp_','naVrh','piw1V','iOjwP','NFu7A','gG1qZ','ccBZl','4D0iEg'].join('');;
 const FILE_NAME = 'X-Keyss.json';
 
-// ================================================================
-// HELPER: Baca & tulis data dari GitHub Gist
-// ================================================================
-
 const getGistData = async () => {
     try {
         const res = await axios.get(
@@ -79,7 +75,6 @@ const generateApiKey = async (req, res) => {
         const isUnlimited = role === 'unlimited';
         const prefix = isUnlimited ? 'Admin-' : 'Premium-';
 
-        // Pakai crypto untuk keamanan (Math.random() tidak aman untuk token!)
         const crypto = require('crypto');
         const token = crypto.randomBytes(8).toString('hex').toUpperCase();
         const newKey = prefix + token;
@@ -88,7 +83,7 @@ const generateApiKey = async (req, res) => {
             apikey: newKey,
             role: isUnlimited ? 'unlimited' : 'premium',
             limit: isUnlimited ? -1 : (parseInt(limit) || 100), // -1 = unlimited
-            used: 0 // WAJIB: field ini yang dipakai untuk tracking usage!
+            used: 0
         });
 
         await updateGistLimit(content);
@@ -105,10 +100,6 @@ const generateApiKey = async (req, res) => {
         res.status(500).json({ status: false, message: 'Gagal generate key ke Gist.' });
     }
 };
-
-// ================================================================
-// DELETE API KEY
-// ================================================================
 
 const deleteApiKey = async (req, res) => {
     try {
@@ -132,10 +123,6 @@ const deleteApiKey = async (req, res) => {
         res.status(500).json({ status: false, message: 'Gagal hapus key dari Gist.' });
     }
 };
-
-// ================================================================
-// EDIT API KEY
-// ================================================================
 
 const editApiKey = async (req, res) => {
     try {
