@@ -117,7 +117,6 @@ const checkApiKey = async (req, res, next) => {
 
         const keyData = dbKeys.keys[keyIndex];
 
-        // [FIX] Cek apakah key unlimited (role unlimited ATAU limit -1)
         const isUnlimited = keyData.role === 'unlimited' || keyData.limit === -1;
 
         if (!isUnlimited) {
@@ -128,7 +127,7 @@ const checkApiKey = async (req, res, next) => {
                     message: "Limit Apikey anda telah habis!" 
                 });
             }
-            // Kurangi limit hanya untuk key premium/non-unlimited
+    
             dbKeys.keys[keyIndex].limit -= 1;
             await updateGistLimit(dbKeys);
         }
