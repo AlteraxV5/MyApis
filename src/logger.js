@@ -1,4 +1,4 @@
-// /root/AltOffx/src/logger.js
+
 const logRouterRequest = (req, res) => {
     res.on('finish', () => {
         let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '';
