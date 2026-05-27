@@ -10,18 +10,15 @@ const keysHandler = require('../router/admin/keys');
 // ================================================================
 
 async function apiKeyAuth(req, res, next) {
-    // Endpoint /api/keys tidak perlu auth (untuk admin panel)
     if (req.path.includes('/api/keys')) {
         return next();
     }
 
-    // Path-path publik yang tidak butuh API key
     const skipAuth = ['/docs', '/landing', '/favicon', '/thumbnail'];
     if (skipAuth.some(p => req.path.startsWith(p))) {
         return next();
     }
 
-    // Ambil API key dari header, query param, atau body
     const apiKey = req.headers['x-api-key'] || req.query.apikey || req.body?.apiKey;
 
     if (!apiKey) {
@@ -31,7 +28,6 @@ async function apiKeyAuth(req, res, next) {
         });
     }
 
-    // Validasi key ke Gist (async - ini penting!)
     const validation = await keysHandler.validateApiKey(apiKey);
 
     if (!validation.valid) {
@@ -41,10 +37,8 @@ async function apiKeyAuth(req, res, next) {
         });
     }
 
-    // Simpan info key di req supaya bisa diakses di handler berikutnya
     req.apiKeyInfo = validation;
 
-    // Set header info limit ke client
     if (validation.isInfinite) {
         res.set('X-RateLimit-Limit', '∞');
         res.set('X-RateLimit-Remaining', '∞');
@@ -53,12 +47,8 @@ async function apiKeyAuth(req, res, next) {
         res.set('X-RateLimit-Remaining', validation.remaining);
     }
 
-    // Tambah hitungan usage HANYA jika response sukses (2xx)
-    // res.on('finish') dipanggil setelah response dikirim ke client
     res.on('finish', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-            // Fire-and-forget: tidak perlu await di sini
-            // karena response sudah dikirim, tapi Gist tetap diupdate di background
             keysHandler.incrementUsage(apiKey).catch(err => {
                 console.error('[apiKeyAuth] Gagal increment usage:', err.message);
             });
