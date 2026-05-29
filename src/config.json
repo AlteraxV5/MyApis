@@ -87,7 +87,7 @@
         "name": "Random Waifu",
         "endpoint": "/api/random/waifu",
         "filename": "waifu",
-        "method": "GET",
+        "method": "Eror",
         "params": []
       }
     ],
@@ -96,7 +96,7 @@
         "name": "Screenshot Web",
         "endpoint": "/api/tools/ssweb",
         "filename": "ssweb",
-        "method": "GET",
+        "method": "Eror",
         "params": [
           {
             "name": "url",
@@ -114,7 +114,7 @@
         "name": "Short URL",
         "endpoint": "/api/tools/shorturl",
         "filename": "shorturl",
-        "method": "GET",
+        "method": "Eror",
         "params": [
           {
             "name": "url",
@@ -286,7 +286,7 @@
         "name": "Instagram Stalk",
         "endpoint": "/api/stalk/ig",
         "filename": "igstalk",
-        "method": "GET",
+        "method": "Eror",
         "params": [
           {
             "name": "username",
