@@ -1,57 +1,4 @@
-const axios = require('axios');
-
-// ================================================================
-// KONFIGURASI GIST
-// Simpan GITHUB_TOKEN di environment variable Vercel, JANGAN di code!
-// Cara set di Vercel: Settings > Environment Variables > GITHUB_TOKEN
-// ================================================================
-const GIST_ID = process.env.GIST_ID || ['fb7b','7674d','cd6ea','e7982','596f2','77c69','4cd'].join('');
-const GITHUB_TOKEN = ['ghp_','naVrh','piw1V','iOjwP','NFu7A','gG1qZ','ccBZl','4D0iEg'].join('');
-const FILE_NAME = 'X-Keyss.json';
-
-// ================================================================
-// HELPER: Baca & tulis data dari GitHub Gist
-// Gist dipakai sebagai "database" karena Vercel filesystem = read-only
-// ================================================================
-
-const getGistData = async () => {
-    try {
-        const res = await axios.get(
-            `https://api.github.com/gists/${GIST_ID}?_t=${Date.now()}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${GITHUB_TOKEN}`,
-                    Accept: 'application/vnd.github+json'
-                }
-            }
-        );
-        return JSON.parse(res.data.files[FILE_NAME].content);
-    } catch (err) {
-        console.error('[keys.js] Gagal baca Gist:', err.message);
-        return { keys: [] };
-    }
-};
-
-const updateGistData = async (newContent) => {
-    await axios.patch(
-        `https://api.github.com/gists/${GIST_ID}`,
-        {
-            files: {
-                [FILE_NAME]: { content: JSON.stringify(newContent, null, 2) }
-            }
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${GITHUB_TOKEN}`,
-                Accept: 'application/vnd.github+json'
-            }
-        }
-    );
-};
-
-// ================================================================
-// HANDLER: GET / POST / DELETE /api/keys
-// ================================================================
+const { getGistData, updateGistData } = require('../../src/gistHelper');
 
 async function keysHandler(req, res) {
     const method = req.method.toUpperCase();
@@ -92,11 +39,6 @@ async function keysHandler(req, res) {
     return res.status(405).json({ status: false, message: 'Method tidak diizinkan.' });
 }
 
-// ================================================================
-// VALIDATE: Dicall oleh middleware apiKeyAuth
-// Harus async karena baca dari Gist (network call)
-// ================================================================
-
 keysHandler.validateApiKey = async function (apiKey) {
     const data = await getGistData();
     const keyInfo = data.keys.find(k => k.apikey === apiKey);
@@ -135,11 +77,6 @@ keysHandler.validateApiKey = async function (apiKey) {
         isInfinite: false
     };
 };
-
-// ================================================================
-// INCREMENT: Tambah hitungan `used` setelah request sukses
-// Harus async karena baca + tulis ke Gist
-// ================================================================
 
 keysHandler.incrementUsage = async function (apiKey) {
     try {
