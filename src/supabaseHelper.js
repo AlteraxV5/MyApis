@@ -137,7 +137,7 @@ const createApiKey = async (apiKey, role, limit) => {
                 service_name: role,
                 encrypted_key: keyHash,
                 rate_limit: isUnlimited ? -1 : (parseInt(limit) || 100),
-                rate_per_hour: isUnlimited ? -1 : 350,
+                rate_per_hour: isUnlimited ? -1 : 500,
                 usage_count: 0,
                 is_active: true,
                 user_id: 1
