@@ -228,7 +228,7 @@
       },
       {
         "name": "Play Downloader",
-        "endpoint": "/api/search/play",
+        "endpoint": "/api/download/play",
         "filename": "play",
         "method": "GET",
         "params": [
