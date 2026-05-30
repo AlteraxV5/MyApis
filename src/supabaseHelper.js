@@ -9,6 +9,12 @@ function hashKey(apiKey) {
     return crypto.createHash('sha256').update(apiKey).digest('hex');
 }
 
+function getCurrentWindow() {
+    const now = new Date();
+    now.setMinutes(0, 0, 0);
+    return now.toISOString().slice(0, 19);
+}
+
 const getApiKeys = async () => {
     try {
         const { data, error } = await supabase
@@ -21,10 +27,11 @@ const getApiKeys = async () => {
         return {
             keys: data.map(k => ({
                 id: k.id,
-                apikey: k.key_name,      
+                apikey: k.key_name,
                 role: k.service_name,
                 limit: k.rate_limit,
                 used: k.usage_count || 0,
+                rate_per_hour: k.rate_per_hour,
                 remaining: k.rate_limit === -1 ? '∞' : (k.rate_limit - (k.usage_count || 0))
             }))
         };
@@ -53,6 +60,70 @@ const validateApiKey = async (apiKey) => {
     }
 };
 
+const checkRateLimit = async (apiKey, keyData) => {
+    try {
+        if (keyData.rate_per_hour === -1) {
+            return { allowed: true, used: 0, limit: -1, remaining: '∞' };
+        }
+
+        const keyHash = hashKey(apiKey);
+        const window = getCurrentWindow();
+        const limit = keyData.rate_per_hour || 350;
+
+        const { data: existing } = await supabase
+            .from('rate_limits')
+            .select('*')
+            .eq('key_hash', keyHash)
+            .eq('window_start', window)
+            .single();
+
+        if (existing) {
+            const used = existing.hit_count;
+            const remaining = limit - used;
+
+            if (remaining <= 0) {
+                return {
+                    allowed: false,
+                    used,
+                    limit,
+                    remaining: 0,
+                    reset_at: new Date(new Date(window).getTime() + 3600000).toISOString()
+                };
+            }
+
+            await supabase
+                .from('rate_limits')
+                .update({ hit_count: used + 1 })
+                .eq('id', existing.id);
+
+            return {
+                allowed: true,
+                used: used + 1,
+                limit,
+                remaining: remaining - 1
+            };
+        } else {
+            await supabase
+                .from('rate_limits')
+                .insert([{
+                    key_hash: keyHash,
+                    window_start: window,
+                    hit_count: 1
+                }]);
+
+            return {
+                allowed: true,
+                used: 1,
+                limit,
+                remaining: limit - 1
+            };
+        }
+    } catch (err) {
+        console.error('[supabaseHelper] Error checkRateLimit:', err.message);
+        return { allowed: true, used: 0, limit: 0, remaining: '?' };
+    }
+};
+
 const createApiKey = async (apiKey, role, limit) => {
     try {
         const keyHash = hashKey(apiKey);
@@ -61,11 +132,12 @@ const createApiKey = async (apiKey, role, limit) => {
         const { data, error } = await supabase
             .from('api_keys')
             .insert([{
-                key_name: apiKey,        
-                key_hash: keyHash,       
-                service_name: role,    
-                encrypted_key: keyHash,     
+                key_name: apiKey,
+                key_hash: keyHash,
+                service_name: role,
+                encrypted_key: keyHash,
                 rate_limit: isUnlimited ? -1 : (parseInt(limit) || 100),
+                rate_per_hour: isUnlimited ? -1 : 350,
                 usage_count: 0,
                 is_active: true,
                 user_id: 1
@@ -90,34 +162,15 @@ const deleteApiKey = async (apiKey) => {
             .eq('key_hash', keyHash);
 
         if (error) throw error;
+        await supabase
+            .from('rate_limits')
+            .delete()
+            .eq('key_hash', keyHash);
+
         return true;
     } catch (err) {
         console.error('[supabaseHelper] Error deleteApiKey:', err.message);
         throw err;
-    }
-};
-
-const incrementUsage = async (apiKey) => {
-    try {
-        const keyHash = hashKey(apiKey);
-
-        const { data } = await supabase
-            .from('api_keys')
-            .select('usage_count, rate_limit')
-            .eq('key_hash', keyHash)
-            .single();
-
-        if (!data || data.rate_limit === -1) return;
-
-        await supabase
-            .from('api_keys')
-            .update({
-                usage_count: (data.usage_count || 0) + 1,
-                last_used_at: new Date().toISOString()
-            })
-            .eq('key_hash', keyHash);
-    } catch (err) {
-        console.error('[supabaseHelper] Error incrementUsage:', err.message);
     }
 };
 
@@ -166,9 +219,9 @@ const updateVisitorData = async (count, todayCount) => {
 module.exports = {
     getApiKeys,
     validateApiKey,
+    checkRateLimit,
     createApiKey,
     deleteApiKey,
-    incrementUsage,
     getVisitorData,
     updateVisitorData,
     hashKey
