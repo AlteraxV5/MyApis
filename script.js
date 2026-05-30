@@ -6,7 +6,7 @@ const { generateQrisDynamic, isStaticQrisConfigured } = require('./src/qris');
 const { loadRouter, initAutoLoad } = require('./src/autoload');
 const { addAdmin, checkAdmin, delAdmin } = require('./admin/list/admin');
 const { generateApiKey, deleteApiKey } = require('./admin/generate-apikey');
-const { getApiKeys, validateApiKey, incrementUsage, getVisitorData, updateVisitorData } = require('./src/supabaseHelper');
+const { getApiKeys, validateApiKey, checkRateLimit, getVisitorData, updateVisitorData } = require('./src/supabaseHelper');
 const fs = require('fs');
 const cors = require('cors');
 
@@ -89,19 +89,28 @@ const checkApiKey = async (req, res, next) => {
             });
         }
 
-        const isUnlimited = keyData.rate_limit === -1;
+        const rateCheck = await checkRateLimit(userKey, keyData);
 
-        if (!isUnlimited) {
-            const remaining = keyData.rate_limit - (keyData.usage_count || 0);
-            if (remaining <= 0) {
-                return res.status(429).json({
-                    status: false,
-                    creator: config.settings.creator,
-                    message: "Limit Apikey anda telah habis!"
-                });
-            }
-            incrementUsage(userKey).catch(e => console.error('[!] Gagal increment:', e));
+        if (!rateCheck.allowed) {
+            return res.status(429).json({
+                status: false,
+                creator: config.settings.creator,
+                message: `Rate limit tercapai! Maksimal ${rateCheck.limit} request/jam.`,
+                rate_limit: {
+                    limit: rateCheck.limit,
+                    used: rateCheck.used,
+                    remaining: 0,
+                    reset_at: rateCheck.reset_at
+                }
+            });
         }
+
+        req.apiKeyData = {
+            role: keyData.service_name,
+            rateLimit: rateCheck.limit,
+            rateUsed: rateCheck.used,
+            rateRemaining: rateCheck.remaining
+        };
 
         incrementVisitor();
         next();
@@ -188,7 +197,7 @@ app.get('/dashboard.html', (req, res) => res.sendFile(path.join(process.cwd(), '
 app.post('/api/create-payment', async (req, res) => {
     const { amount } = req.body;
     if (!isStaticQrisConfigured()) {
-        return res.status(503).json({ status: 'error', message: 'QRIS unavailable', creator: config.settings.creator });
+        return res.status(503).json({ status: 'error', message: 'QRIS unavailable' });
     }
     if (!amount || isNaN(parseInt(amount)) || parseInt(amount) < 1000) {
         return res.status(400).json({ status: 'error', message: 'Minimum Rp 1.000' });
@@ -219,16 +228,39 @@ app.get('/api/key-info', async (req, res) => {
         const keyData = await validateApiKey(userKey);
         if (!keyData) return res.status(404).json({ status: false, message: "Apikey tidak ditemukan!" });
 
-        const isUnlimited = keyData.rate_limit === -1;
+        const isUnlimited = keyData.rate_per_hour === -1;
+
+        const { createClient } = require('@supabase/supabase-js');
+        const { hashKey } = require('./src/supabaseHelper');
+        const supabase = createClient(
+            process.env.SUPABASE_URL || 'https://gqkqclsgksbeaxndrniw.supabase.co',
+            process.env.SUPABASE_KEY || 'sb_publishable_w61nP0p0Okr0gBFjuHCsUQ_Qi7CsM0Y'
+        );
+        const now = new Date();
+        now.setMinutes(0, 0, 0);
+        const window = now.toISOString().slice(0, 19);
+        const { data: rateData } = await supabase
+            .from('rate_limits')
+            .select('hit_count')
+            .eq('key_hash', hashKey(userKey))
+            .eq('window_start', window)
+            .single();
+
+        const usedThisHour = rateData?.hit_count || 0;
+        const rateLimit = keyData.rate_per_hour;
+
         res.json({
             status: true,
             creator: config.settings.creator,
             info: {
                 role: keyData.service_name,
-                limit: isUnlimited ? '∞' : keyData.rate_limit,
-                used: keyData.usage_count || 0,
-                remaining: isUnlimited ? '∞' : (keyData.rate_limit - (keyData.usage_count || 0)),
-                unlimited: isUnlimited
+                unlimited: isUnlimited,
+                rate_limit: {
+                    limit_per_hour: isUnlimited ? '∞' : rateLimit,
+                    used_this_hour: isUnlimited ? 0 : usedThisHour,
+                    remaining_this_hour: isUnlimited ? '∞' : (rateLimit - usedThisHour),
+                    resets_in: `${60 - new Date().getMinutes()} minutes`
+                }
             }
         });
     } catch (err) {
@@ -278,7 +310,7 @@ app.use((req, res) => {
 initAutoLoad(app, config, configPath);
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log('\n🚀 Server jalan (Supabase Mode)!');
+    console.log('\n🚀 Server jalan (Supabase + Rate Limiting Mode)!');
     console.log('----------------------------------');
     console.log('Server: http://localhost:3000/docs');
     console.log('----------------------------------');
