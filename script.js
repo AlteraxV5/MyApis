@@ -7,7 +7,7 @@ const { loadRouter, initAutoLoad } = require('./src/autoload');
 const bodyParser = require('body-parser');
 const { addAdmin, checkAdmin, delAdmin } = require('./admin/list/admin');
 const { generateApiKey, deleteApiKey } = require('./admin/generate-apikey');
-const { getGistData, updateGistData } = require('./src/gistHelper');
+const { getApiKeys, getVisitorData, updateVisitorData } = require('./src/supabaseHelper');
 const fs = require('fs');
 const cors = require('cors');
 
@@ -26,22 +26,26 @@ let localVisitorCache = { count: 0, todayCount: 0, date: new Date().toISOString(
 
 const initVisitorData = async () => {
     try {
-        const dbData = await getGistData();
+        const visitorData = await getVisitorData();
         let today = new Date().toISOString().split('T')[0];
         
-        if (dbData.visitors) {
-            if (dbData.visitors.date !== today) {
-                dbData.visitors.todayCount = 0;
-                dbData.visitors.date = today;
-                await updateGistData(dbData);
+        if (visitorData) {
+            if (visitorData.date !== today) {
+                localVisitorCache = { count: visitorData.total_count || 0, todayCount: 0, date: today };
+                await updateVisitorData(visitorData.total_count || 0, 0);
+            } else {
+                localVisitorCache = { 
+                    count: visitorData.total_count || 0, 
+                    todayCount: visitorData.today_count || 0, 
+                    date: today 
+                };
             }
-            localVisitorCache = dbData.visitors;
         } else {
-            dbData.visitors = localVisitorCache;
-            await updateGistData(dbData);
+            localVisitorCache = { count: 0, todayCount: 0, date: today };
+            await updateVisitorData(0, 0);
         }
     } catch (e) {
-        console.error("[!] Gagal meload data visitor dari Gist:", e);
+        console.error("[!] Gagal load visitor data dari Supabase:", e);
     }
 };
 initVisitorData();
@@ -61,10 +65,8 @@ const incrementVisitor = () => {
         localVisitorCache.count += 1;
         localVisitorCache.todayCount += 1;
         
-        getGistData().then(async (dbData) => {
-            dbData.visitors = localVisitorCache;
-            await updateGistData(dbData);
-        }).catch(e => console.error("[!] Gagal update visitor ke Gist:", e));
+        updateVisitorData(localVisitorCache.count, localVisitorCache.todayCount)
+            .catch(e => console.error("[!] Gagal update visitor ke Supabase:", e));
         
     } catch (error) {
         console.error('[✗] Error incrementing visitor:', error);
@@ -101,10 +103,10 @@ const checkApiKey = async (req, res, next) => {
     }
 
     try {
-        const dbKeys = await getGistData();
-        const keyIndex = dbKeys.keys.findIndex(k => k.apikey === userKey);
+        const result = await getApiKeys();
+        const keyData = result.keys.find(k => k.apikey === userKey);
 
-        if (keyIndex === -1) {
+        if (!keyData) {
             return res.status(403).json({ 
                 status: false, 
                 creator: config.settings.creator, 
@@ -112,28 +114,23 @@ const checkApiKey = async (req, res, next) => {
             });
         }
 
-        const keyData = dbKeys.keys[keyIndex];
-
-        const isUnlimited = keyData.role === 'unlimited' || keyData.limit === -1;
+        const isUnlimited = keyData.limit === -1;
 
         if (!isUnlimited) {
-            if (keyData.limit <= 0) {
+            if (keyData.remaining <= 0) {
                 return res.status(429).json({ 
                     status: false, 
                     creator: config.settings.creator,
                     message: "Limit Apikey anda telah habis!" 
                 });
             }
-    
-            dbKeys.keys[keyIndex].limit -= 1;
-            await updateGistData(dbKeys);
         }
 
         incrementVisitor();
         next();
     } catch (error) {
-        console.error("Gist Auth Error:", error);
-        res.status(500).json({ status: false, message: "Gagal memproses Apikey (GitHub Gist Error)" });
+        console.error("API Key Validation Error:", error);
+        res.status(500).json({ status: false, message: "Gagal memproses Apikey (Supabase Error)" });
     }
 };
 
@@ -161,8 +158,8 @@ app.get('/admin/list-apikey', async (req, res) => {
     if (!checkAdmin(username, password)) return res.status(401).send("Unauthorized");
     
     try {
-        const dbKeys = await getGistData();
-        res.json(dbKeys.keys);
+        const result = await getApiKeys();
+        res.json(result.keys);
     } catch (e) {
         res.json([]);
     }
@@ -179,8 +176,8 @@ app.get('/admin/server-status', async (req, res) => {
 
     let totalApikey = 0;
     try {
-        const dbKeys = await getGistData();
-        totalApikey = dbKeys && dbKeys.keys ? dbKeys.keys.length : 0;
+        const result = await getApiKeys();
+        totalApikey = result.keys ? result.keys.length : 0;
     } catch (e) {
         totalApikey = 0;
     }
@@ -296,8 +293,8 @@ app.get('/api/key-info', async (req, res) => {
     }
 
     try {
-        const dbKeys = await getGistData();
-        const keyData = dbKeys.keys.find(k => k.apikey === userKey);
+        const result = await getApiKeys();
+        const keyData = result.keys.find(k => k.apikey === userKey);
 
         if (!keyData) {
             return res.status(404).json({
@@ -307,16 +304,14 @@ app.get('/api/key-info', async (req, res) => {
             });
         }
 
-        const isUnlimited = keyData.role === 'unlimited' || keyData.limit === -1;
-
         return res.json({
             status: true,
             creator: config.settings.creator,
             info: {
                 role: keyData.role,
-                limit: isUnlimited ? '∞' : keyData.limit,
-                used: isUnlimited ? '∞' : (keyData.limit - keyData.limit),
-                unlimited: isUnlimited
+                limit: keyData.limit === -1 ? '∞' : keyData.limit,
+                used: keyData.used || 0,
+                unlimited: keyData.limit === -1
             }
         });
     } catch (err) {
@@ -396,7 +391,7 @@ app.use((req, res) => {
 initAutoLoad(app, config, configPath);
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('\n🚀 Server berhasil jalan (Cloud Database Mode)!');
+  console.log('\n🚀 Server berhasil jalan (Supabase Database Mode)!');
   console.log('----------------------------------');
   console.log('RestApi: https://altoffx-myapi.vercel.app');
   console.log('Server running on http://localhost:3000/docs');
