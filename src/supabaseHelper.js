@@ -3,31 +3,11 @@ const crypto = require('crypto');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://gqkqclsgksbeaxndrniw.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_w61nP0p0Okr0gBFjuHCsUQ_Qi7CsM0Y';
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-function encryptKey(apiKey) {
-    const encryptionKey = process.env.ENCRYPTION_KEY || 'supabase-default-key-change-this';
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(encryptionKey.padEnd(32, '0').slice(0, 32)), iv);
-    let encrypted = cipher.update(apiKey, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return iv.toString('hex') + ':' + encrypted;
-}
-
-function decryptKey(encryptedData) {
-    const encryptionKey = process.env.ENCRYPTION_KEY || 'supabase-default-key-change-this';
-    const [iv, encrypted] = encryptedData.split(':');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(encryptionKey.padEnd(32, '0').slice(0, 32)), Buffer.from(iv, 'hex'));
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-}
 
 function hashKey(apiKey) {
     return crypto.createHash('sha256').update(apiKey).digest('hex');
 }
-
 
 const getApiKeys = async () => {
     try {
@@ -36,28 +16,28 @@ const getApiKeys = async () => {
             .select('*')
             .eq('is_active', true);
 
-        if (error) {
-            console.error('[supabaseHelper] Gagal baca API keys:', error.message);
-            return { keys: [] };
-        }
+        if (error) throw error;
 
         return {
             keys: data.map(k => ({
-                apikey: k.key_hash, // Return hash, not encrypted key
-                role: k.service_name ? 'premium' : 'admin',
+                id: k.id,
+                apikey: k.key_name,      
+                role: k.service_name,
                 limit: k.rate_limit,
-                used: k.usage_count || 0
+                used: k.usage_count || 0,
+                remaining: k.rate_limit === -1 ? '∞' : (k.rate_limit - (k.usage_count || 0))
             }))
         };
     } catch (err) {
-        console.error('[supabaseHelper] Error getting API keys:', err.message);
+        console.error('[supabaseHelper] Error getApiKeys:', err.message);
         return { keys: [] };
     }
 };
 
-
-const getApiKeyByHash = async (keyHash) => {
+const validateApiKey = async (apiKey) => {
     try {
+        const keyHash = hashKey(apiKey);
+
         const { data, error } = await supabase
             .from('api_keys')
             .select('*')
@@ -65,135 +45,94 @@ const getApiKeyByHash = async (keyHash) => {
             .eq('is_active', true)
             .single();
 
-        if (error) {
-            console.error('[supabaseHelper] Key not found:', error.message);
-            return null;
-        }
-
+        if (error || !data) return null;
         return data;
     } catch (err) {
-        console.error('[supabaseHelper] Error getting key by hash:', err.message);
+        console.error('[supabaseHelper] Error validateApiKey:', err.message);
         return null;
     }
 };
 
-const createApiKey = async (userId, keyName, serviceName, apiKey) => {
+const createApiKey = async (apiKey, role, limit) => {
     try {
-        const encryptedKey = encryptKey(apiKey);
+        const keyHash = hashKey(apiKey);
+        const isUnlimited = role === 'unlimited';
+
+        const { data, error } = await supabase
+            .from('api_keys')
+            .insert([{
+                key_name: apiKey,        
+                key_hash: keyHash,       
+                service_name: role,    
+                encrypted_key: keyHash,     
+                rate_limit: isUnlimited ? -1 : (parseInt(limit) || 100),
+                usage_count: 0,
+                is_active: true,
+                user_id: 1
+            }])
+            .select();
+
+        if (error) throw error;
+        return data[0];
+    } catch (err) {
+        console.error('[supabaseHelper] Error createApiKey:', err.message);
+        throw err;
+    }
+};
+
+const deleteApiKey = async (apiKey) => {
+    try {
         const keyHash = hashKey(apiKey);
 
-        const { data, error } = await supabase
-            .from('api_keys')
-            .insert([
-                {
-                    user_id: userId,
-                    key_name: keyName,
-                    service_name: serviceName,
-                    encrypted_key: encryptedKey,
-                    key_hash: keyHash,
-                    is_active: true,
-                    usage_count: 0
-                }
-            ])
-            .select();
-
-        if (error) {
-            console.error('[supabaseHelper] Gagal create key:', error.message);
-            throw error;
-        }
-
-        return data[0];
-    } catch (err) {
-        console.error('[supabaseHelper] Error creating API key:', err.message);
-        throw err;
-    }
-};
-
-
-const updateApiKey = async (keyId, updates) => {
-    try {
-        const { data, error } = await supabase
-            .from('api_keys')
-            .update({
-                ...updates,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', keyId)
-            .select();
-
-        if (error) {
-            console.error('[supabaseHelper] Gagal update key:', error.message);
-            throw error;
-        }
-
-        return data[0];
-    } catch (err) {
-        console.error('[supabaseHelper] Error updating API key:', err.message);
-        throw err;
-    }
-};
-
-const deleteApiKey = async (keyHash) => {
-    try {
         const { error } = await supabase
             .from('api_keys')
             .delete()
             .eq('key_hash', keyHash);
 
-        if (error) {
-            console.error('[supabaseHelper] Gagal delete key:', error.message);
-            throw error;
-        }
-
+        if (error) throw error;
         return true;
     } catch (err) {
-        console.error('[supabaseHelper] Error deleting API key:', err.message);
+        console.error('[supabaseHelper] Error deleteApiKey:', err.message);
         throw err;
     }
 };
 
-const incrementUsage = async (keyHash) => {
+const incrementUsage = async (apiKey) => {
     try {
-        const keyData = await getApiKeyByHash(keyHash);
-        if (!keyData) return false;
+        const keyHash = hashKey(apiKey);
 
-        const { error } = await supabase
+        const { data } = await supabase
+            .from('api_keys')
+            .select('usage_count, rate_limit')
+            .eq('key_hash', keyHash)
+            .single();
+
+        if (!data || data.rate_limit === -1) return;
+
+        await supabase
             .from('api_keys')
             .update({
-                usage_count: (keyData.usage_count || 0) + 1,
+                usage_count: (data.usage_count || 0) + 1,
                 last_used_at: new Date().toISOString()
             })
             .eq('key_hash', keyHash);
-
-        if (error) {
-            console.error('[supabaseHelper] Gagal increment usage:', error.message);
-            return false;
-        }
-
-        return true;
     } catch (err) {
-        console.error('[supabaseHelper] Error incrementing usage:', err.message);
-        return false;
+        console.error('[supabaseHelper] Error incrementUsage:', err.message);
     }
 };
 
 const getVisitorData = async () => {
     try {
+        const today = new Date().toISOString().split('T')[0];
         const { data, error } = await supabase
             .from('visitor_stats')
             .select('*')
-            .order('created_at', { ascending: false })
-            .limit(1)
+            .eq('date', today)
             .single();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 = not found
-            console.error('[supabaseHelper] Gagal baca visitor data:', error.message);
-            return null;
-        }
-
+        if (error) return null;
         return data;
     } catch (err) {
-        console.error('[supabaseHelper] Error getting visitor data:', err.message);
         return null;
     }
 };
@@ -201,59 +140,36 @@ const getVisitorData = async () => {
 const updateVisitorData = async (count, todayCount) => {
     try {
         const today = new Date().toISOString().split('T')[0];
-        
-        const { data: existingData } = await supabase
+        const { data: existing } = await supabase
             .from('visitor_stats')
-            .select('*')
+            .select('id')
             .eq('date', today)
             .single();
 
-        if (existingData) {
-            const { error } = await supabase
+        if (existing) {
+            await supabase
                 .from('visitor_stats')
-                .update({
-                    total_count: count,
-                    today_count: todayCount,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', existingData.id);
-
-            if (error) {
-                console.error('[supabaseHelper] Gagal update visitor:', error.message);
-                return false;
-            }
+                .update({ total_count: count, today_count: todayCount, updated_at: new Date().toISOString() })
+                .eq('id', existing.id);
         } else {
-            const { error } = await supabase
+            await supabase
                 .from('visitor_stats')
-                .insert([{
-                    date: today,
-                    total_count: count,
-                    today_count: todayCount
-                }]);
-
-            if (error) {
-                console.error('[supabaseHelper] Gagal insert visitor:', error.message);
-                return false;
-            }
+                .insert([{ date: today, total_count: count, today_count: todayCount }]);
         }
-
         return true;
     } catch (err) {
-        console.error('[supabaseHelper] Error updating visitor data:', err.message);
+        console.error('[supabaseHelper] Error updateVisitorData:', err.message);
         return false;
     }
 };
 
 module.exports = {
     getApiKeys,
-    getApiKeyByHash,
+    validateApiKey,
     createApiKey,
-    updateApiKey,
     deleteApiKey,
     incrementUsage,
     getVisitorData,
     updateVisitorData,
-    encryptKey,
-    decryptKey,
     hashKey
 };
