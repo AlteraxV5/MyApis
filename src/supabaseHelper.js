@@ -90,7 +90,7 @@ const checkRateLimit = async (apiKey, keyData) => {
                     reset_at: new Date(new Date(window).getTime() + 3600000).toISOString()
                 };
             }
-
+            
             await supabase
                 .from('rate_limits')
                 .update({ hit_count: used + 1 })
@@ -119,7 +119,7 @@ const checkRateLimit = async (apiKey, keyData) => {
             };
         }
     } catch (err) {
-        console.error('[supabaseHelper] Error checkRateLimit:', err.message);
+        console.error('[supabaseHelper] Error checkRateLimit:', err.message)
         return { allowed: true, used: 0, limit: 0, remaining: '?' };
     }
 };
@@ -137,7 +137,7 @@ const createApiKey = async (apiKey, role, limit) => {
                 service_name: role,
                 encrypted_key: keyHash,
                 rate_limit: isUnlimited ? -1 : (parseInt(limit) || 100),
-                rate_per_hour: isUnlimited ? -1 : 500,
+                rate_per_hour: isUnlimited ? -1 : 350,
                 usage_count: 0,
                 is_active: true,
                 user_id: 1
@@ -162,6 +162,7 @@ const deleteApiKey = async (apiKey) => {
             .eq('key_hash', keyHash);
 
         if (error) throw error;
+
         await supabase
             .from('rate_limits')
             .delete()
@@ -224,5 +225,6 @@ module.exports = {
     deleteApiKey,
     getVisitorData,
     updateVisitorData,
-    hashKey
+    hashKey,
+    getCurrentWindow
 };
