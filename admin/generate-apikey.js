@@ -21,7 +21,7 @@ const generateApiKey = async (req, res) => {
         res.json({
             status: true,
             message: 'Key berhasil dibuat!',
-            apikey: newKey,                   
+            apikey: newKey,
             role: isUnlimited ? 'unlimited' : 'premium',
             limit: isUnlimited ? '∞' : keyLimit
         });
@@ -40,7 +40,6 @@ const deleteApiKeyHandler = async (req, res) => {
         }
 
         await deleteApiKey(apikey);
-
         res.json({ status: true, message: 'Key berhasil dihapus!' });
     } catch (err) {
         console.error('[delete-apikey] Error:', err.message);
