@@ -60,21 +60,25 @@ const validateApiKey = async (apiKey) => {
 };
 
 const checkRateLimit = async (apiKey, keyData) => {
+    const window = getCurrentWindow();
+    console.log('[checkRateLimit] key:', apiKey.slice(0, 10), 'window:', window, 'rate_per_hour:', keyData.rate_per_hour);
+
     try {
         if (keyData.rate_per_hour === -1) {
             return { allowed: true, used: 0, limit: -1, remaining: '∞' };
         }
 
         const keyHash = hashKey(apiKey);
-        const window = getCurrentWindow();
         const limit = keyData.rate_per_hour || 350;
 
-        const { data: existing } = await supabase
+        const { data: existing, error: selectError } = await supabase
             .from('rate_limits')
             .select('*')
             .eq('key_hash', keyHash)
             .eq('window_start', window)
             .single();
+
+        console.log('[checkRateLimit] existing:', existing, 'selectError:', selectError?.message);
 
         if (existing) {
             const used = existing.hit_count;
@@ -84,21 +88,25 @@ const checkRateLimit = async (apiKey, keyData) => {
                 return { allowed: false, used, limit, remaining: 0 };
             }
 
-            await supabase
+            const { error: updateError } = await supabase
                 .from('rate_limits')
                 .update({ hit_count: used + 1 })
                 .eq('id', existing.id);
 
+            console.log('[checkRateLimit] update error:', updateError?.message);
+
             return { allowed: true, used: used + 1, limit, remaining: remaining - 1 };
         } else {
-            await supabase
+            const { error: insertError } = await supabase
                 .from('rate_limits')
                 .insert([{ key_hash: keyHash, window_start: window, hit_count: 1 }]);
+
+            console.log('[checkRateLimit] insert error:', insertError?.message);
 
             return { allowed: true, used: 1, limit, remaining: limit - 1 };
         }
     } catch (err) {
-        console.error('[supabaseHelper] checkRateLimit error:', err.message);
+        console.error('[checkRateLimit] error:', err.message);
         return { allowed: true, used: 0, limit: 0, remaining: '?' };
     }
 };
@@ -206,3 +214,4 @@ module.exports = {
     hashKey,
     getCurrentWindow
 };
+                      
