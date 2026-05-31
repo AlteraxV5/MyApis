@@ -4,9 +4,10 @@ const path = require('path');
 const os = require('os');
 const { generateQrisDynamic, isStaticQrisConfigured } = require('./src/qris');
 const { loadRouter, initAutoLoad } = require('./src/autoload');
+const bodyParser = require('body-parser');
 const { addAdmin, checkAdmin, delAdmin } = require('./admin/list/admin');
 const { generateApiKey, deleteApiKey } = require('./admin/generate-apikey');
-const { getApiKeys, validateApiKey, checkRateLimit, getVisitorData, updateVisitorData } = require('./src/supabaseHelper');
+const { getApiKeys, getVisitorData, updateVisitorData } = require('./src/supabaseHelper');
 const fs = require('fs');
 const cors = require('cors');
 
@@ -21,19 +22,32 @@ const configNya = [
 
 let localVisitorCache = { count: 0, todayCount: 0, date: new Date().toISOString().split('T')[0] };
 
+// ================================================================
+// Initialize Visitor Data from Supabase
+// ================================================================
+
 const initVisitorData = async () => {
     try {
         const visitorData = await getVisitorData();
-        const today = new Date().toISOString().split('T')[0];
+        let today = new Date().toISOString().split('T')[0];
+        
         if (visitorData) {
-            localVisitorCache = {
-                count: visitorData.total_count || 0,
-                todayCount: visitorData.today_count || 0,
-                date: today
-            };
+            if (visitorData.date !== today) {
+                localVisitorCache = { count: visitorData.total_count || 0, todayCount: 0, date: today };
+                await updateVisitorData(visitorData.total_count || 0, 0);
+            } else {
+                localVisitorCache = { 
+                    count: visitorData.total_count || 0, 
+                    todayCount: visitorData.today_count || 0, 
+                    date: today 
+                };
+            }
+        } else {
+            localVisitorCache = { count: 0, todayCount: 0, date: today };
+            await updateVisitorData(0, 0);
         }
     } catch (e) {
-        console.error("[!] Gagal load visitor:", e);
+        console.error("[!] Gagal load visitor data dari Supabase:", e);
     }
 };
 initVisitorData();
@@ -43,15 +57,20 @@ const visit = () => localVisitorCache.count;
 
 const incrementVisitor = () => {
     try {
-        const today = new Date().toISOString().split('T')[0];
+        let today = new Date().toISOString().split('T')[0];
+        
         if (localVisitorCache.date !== today) {
             localVisitorCache.todayCount = 0;
             localVisitorCache.date = today;
         }
+        
         localVisitorCache.count += 1;
         localVisitorCache.todayCount += 1;
+        
+        // Update to Supabase (async, don't block request)
         updateVisitorData(localVisitorCache.count, localVisitorCache.todayCount)
-            .catch(e => console.error("[!] Gagal update visitor:", e));
+            .catch(e => console.error("[!] Gagal update visitor ke Supabase:", e));
+        
     } catch (error) {
         console.error('[✗] Error incrementing visitor:', error);
     }
@@ -59,64 +78,65 @@ const incrementVisitor = () => {
 
 let configPath = '';
 for (const p of configNya) {
-    if (fs.existsSync(p)) { configPath = p; break; }
+  if (fs.existsSync(p)) {
+    configPath = p;
+    break;
+  }
 }
-if (!configPath) { console.error('[✗] Config not found'); process.exit(1); }
+
+if (!configPath) {
+  console.error('[✗] Config file not found');
+  process.exit(1);
+}
+
 let config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
+// ================================================================
+// API Key Validation Middleware
+// ================================================================
 const checkApiKey = async (req, res, next) => {
     if (!req.path.startsWith('/api/')) return next();
     if (req.path === '/api/create-payment') return next();
 
     const userKey = req.query.apikey || (req.body && (req.body.apikey || req.body.apiKey));
-
+    
     if (!userKey) {
-        return res.status(403).json({
-            status: false,
-            creator: config.settings.creator,
-            message: "Apikey dibutuhkan! (?apikey=your_key)"
+        return res.status(403).json({ 
+            status: false, 
+            creator: config.settings.creator, 
+            message: "Apikey dibutuhkan! (Kirim via query ?apikey=your_key atau di dalam body)" 
         });
     }
 
     try {
-        const keyData = await validateApiKey(userKey);
+        const result = await getApiKeys();
+        const keyData = result.keys.find(k => k.apikey === userKey);
 
         if (!keyData) {
-            return res.status(403).json({
-                status: false,
-                creator: config.settings.creator,
-                message: "Apikey tidak terdaftar atau telah dihapus!"
+            return res.status(403).json({ 
+                status: false, 
+                creator: config.settings.creator, 
+                message: "Apikey tidak terdaftar atau telah dihapus!" 
             });
         }
 
-        const rateCheck = await checkRateLimit(userKey, keyData);
+        const isUnlimited = keyData.limit === -1;
 
-        if (!rateCheck.allowed) {
-            return res.status(429).json({
-                status: false,
-                creator: config.settings.creator,
-                message: `Rate limit tercapai! Maksimal ${rateCheck.limit} request/jam.`,
-                rate_limit: {
-                    limit: rateCheck.limit,
-                    used: rateCheck.used,
-                    remaining: 0,
-                    reset_at: rateCheck.reset_at
-                }
-            });
+        if (!isUnlimited) {
+            if (keyData.remaining <= 0) {
+                return res.status(429).json({ 
+                    status: false, 
+                    creator: config.settings.creator,
+                    message: "Limit Apikey anda telah habis!" 
+                });
+            }
         }
-
-        req.apiKeyData = {
-            role: keyData.service_name,
-            rateLimit: rateCheck.limit,
-            rateUsed: rateCheck.used,
-            rateRemaining: rateCheck.remaining
-        };
 
         incrementVisitor();
         next();
     } catch (error) {
-        console.error("API Key Error:", error);
-        res.status(500).json({ status: false, message: "Gagal memproses Apikey" });
+        console.error("API Key Validation Error:", error);
+        res.status(500).json({ status: false, message: "Gagal memproses Apikey (Supabase Error)" });
     }
 };
 
@@ -129,7 +149,11 @@ app.use('/src', express.static(path.join(__dirname, 'src')));
 
 app.post('/admin/list/admin', (req, res) => {
     const { username, password } = req.body;
-    res.json(checkAdmin(username, password) ? { status: true, token: 'Sign in' } : { status: false });
+    if (checkAdmin(username, password)) {
+        res.json({ status: true, token: 'Sign in' });
+    } else {
+        res.json({ status: false });
+    }
 });
 
 app.post('/admin/generate-apikey', generateApiKey);
@@ -138,16 +162,19 @@ app.delete('/admin/delete-apikey', deleteApiKey);
 app.get('/admin/list-apikey', async (req, res) => {
     const { username, password } = req.query;
     if (!checkAdmin(username, password)) return res.status(401).send("Unauthorized");
+    
     try {
         const result = await getApiKeys();
         res.json(result.keys);
-    } catch (e) { res.json([]); }
+    } catch (e) {
+        res.json([]);
+    }
 });
 
 app.get('/admin/server-status', async (req, res) => {
     const formatTime = (seconds) => {
-        const d = Math.floor(seconds / 86400);
-        const h = Math.floor((seconds % 86400) / 3600);
+        const d = Math.floor(seconds / (3600*24));
+        const h = Math.floor((seconds % (3600*24)) / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = Math.floor(seconds % 60);
         return `${d}d ${h}h ${m}m ${s}s`;
@@ -157,23 +184,26 @@ app.get('/admin/server-status', async (req, res) => {
     try {
         const result = await getApiKeys();
         totalApikey = result.keys ? result.keys.length : 0;
-    } catch (e) {}
+    } catch (e) {
+        totalApikey = 0;
+    }
 
     let totalRoutes = 0;
-    if (config?.tags) {
+    if (config && config.tags) {
         Object.values(config.tags).forEach(arr => {
             if (Array.isArray(arr)) totalRoutes += arr.length;
         });
     }
 
     const vData = visitData();
+
     res.json({
         processUptime: formatTime(process.uptime()),
-        systemUptime: formatTime(os.uptime()),
-        totalHit: vData.count || 0,
-        todayHit: vData.todayCount || 0,
-        totalUser: totalApikey,
-        totalApiKey: totalApikey,
+        systemUptime: formatTime(os.uptime()),     
+        totalHit: vData.count || 0,              
+        todayHit: vData.todayCount || 0,         
+        totalUser: totalApikey,                  
+        totalApiKey: totalApikey,        
         routerActive: `${totalRoutes}/${totalRoutes}`
     });
 });
@@ -190,77 +220,104 @@ app.post('/admin/delete', (req, res) => {
     res.json({ status: true, message: 'Admin deleted' });
 });
 
-app.get('/admin', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'admin.html')));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'dashboard.html')));
-app.get('/dashboard.html', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'dashboard.html')));
+app.get('/admin/list', (req, res) => {
+    res.json(typeof admins !== 'undefined' ? admins : []);
+});
+
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'admin.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'dashboard.html'));
+});
+
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'dashboard.html'));
+});
 
 app.post('/api/create-payment', async (req, res) => {
-    const { amount } = req.body;
-    if (!isStaticQrisConfigured()) {
-        return res.status(503).json({ status: 'error', message: 'QRIS unavailable' });
+  const { amount, name } = req.body;
+
+  if (!isStaticQrisConfigured()) {
+    return res.status(503).json({
+      status: 'error',
+      message: 'QRIS payment is temporarily unavailable',
+      creator: config.settings.creator,
+      note: 'Please configure STATIC_QRIS in src/qris.js'
+    });
+  }
+
+  if (!amount || isNaN(parseInt(amount)) || parseInt(amount) < 1000) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Minimum Rp 1.000'
+    });
+  }
+
+  try {
+    const nominal = parseInt(amount);
+    const qrString = generateQrisDynamic(nominal);
+
+    if (!qrString) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to generate QRIS',
+        creator: config.settings.creator
+      });
     }
-    if (!amount || isNaN(parseInt(amount)) || parseInt(amount) < 1000) {
-        return res.status(400).json({ status: 'error', message: 'Minimum Rp 1.000' });
-    }
-    try {
-        const nominal = parseInt(amount);
-        const qrString = generateQrisDynamic(nominal);
-        if (!qrString) return res.status(500).json({ status: 'error', message: 'Failed to generate QRIS' });
-        await new Promise(r => setTimeout(r, 500));
-        res.json({
-            creator: config.settings.creator,
-            status: 'success',
-            order_id: `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-            amount: nominal,
-            qr_string: qrString,
-            expired_at: Date.now() + 300000
-        });
-    } catch (error) {
-        res.status(500).json({ status: 'error', message: 'Internal Server Error' });
-    }
+
+    const orderId = `Q-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    await new Promise(r => setTimeout(r, 500));
+
+    res.json({
+      creator: config.settings.creator,
+      status: 'success',
+      order_id: orderId,
+      amount: nominal,
+      qr_string: qrString,
+      expired_at: Date.now() + 300000
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal Server Error'
+    });
+  }
 });
 
 app.get('/api/key-info', async (req, res) => {
     const userKey = req.query.apikey || req.headers['x-api-key'];
-    if (!userKey) return res.status(400).json({ status: false, message: "Masukkan apikey di ?apikey=your_key" });
+
+    if (!userKey) {
+        return res.status(400).json({
+            status: false,
+            creator: config.settings.creator,
+            message: "Masukkan apikey di query ?apikey=your_key"
+        });
+    }
 
     try {
-        const keyData = await validateApiKey(userKey);
-        if (!keyData) return res.status(404).json({ status: false, message: "Apikey tidak ditemukan!" });
+        const result = await getApiKeys();
+        const keyData = result.keys.find(k => k.apikey === userKey);
 
-        const isUnlimited = keyData.rate_per_hour === -1;
+        if (!keyData) {
+            return res.status(404).json({
+                status: false,
+                creator: config.settings.creator,
+                message: "Apikey tidak ditemukan!"
+            });
+        }
 
-        const { createClient } = require('@supabase/supabase-js');
-        const { hashKey } = require('./src/supabaseHelper');
-        const supabase = createClient(
-            process.env.SUPABASE_URL || 'https://gqkqclsgksbeaxndrniw.supabase.co',
-            process.env.SUPABASE_KEY || 'sb_publishable_w61nP0p0Okr0gBFjuHCsUQ_Qi7CsM0Y'
-        );
-        const now = new Date();
-        now.setMinutes(0, 0, 0);
-        const window = now.toISOString().slice(0, 19);
-        const { data: rateData } = await supabase
-            .from('rate_limits')
-            .select('hit_count')
-            .eq('key_hash', hashKey(userKey))
-            .eq('window_start', window)
-            .single();
-
-        const usedThisHour = rateData?.hit_count || 0;
-        const rateLimit = keyData.rate_per_hour;
-
-        res.json({
+        return res.json({
             status: true,
             creator: config.settings.creator,
             info: {
-                role: keyData.service_name,
-                unlimited: isUnlimited,
-                rate_limit: {
-                    limit_per_hour: isUnlimited ? '∞' : rateLimit,
-                    used_this_hour: isUnlimited ? 0 : usedThisHour,
-                    remaining_this_hour: isUnlimited ? '∞' : (rateLimit - usedThisHour),
-                    resets_in: `${60 - new Date().getMinutes()} minutes`
-                }
+                role: keyData.role,
+                limit: keyData.limit === -1 ? '∞' : keyData.limit,
+                used: keyData.used || 0,
+                unlimited: keyData.limit === -1
             }
         });
     } catch (err) {
@@ -269,49 +326,85 @@ app.get('/api/key-info', async (req, res) => {
 });
 
 app.use(checkApiKey);
+
 loadRouter(app, config);
 
 app.get('/config', (req, res) => {
-    try {
-        const currentConfig = JSON.parse(JSON.stringify(config));
-        currentConfig.settings.visitors = visit().toString();
-        currentConfig.qris_configured = isStaticQrisConfigured();
-        for (const category in currentConfig.tags) {
-            currentConfig.tags[category].forEach(api => {
-                const hasApiKey = api.params?.some(p => p.name.toLowerCase() === 'apikey');
-                if (!hasApiKey && api.endpoint.startsWith('/api/')) {
-                    if (!api.params) api.params = [];
-                    api.params.push({ name: "apikey", required: true, description: "Registered API Key" });
-                }
-            });
+  try {
+    const currentConfig = JSON.parse(JSON.stringify(config));
+    currentConfig.settings.visitors = visit().toString();
+    currentConfig.qris_configured = isStaticQrisConfigured();
+
+    for (const category in currentConfig.tags) {
+      currentConfig.tags[category].forEach(api => {
+        const hasApiKey = api.params && api.params.some(p => p.name.toLowerCase() === 'apikey');
+        
+        if (!hasApiKey && api.endpoint.startsWith('/api/')) {
+          if (!api.params) api.params = [];
+          api.params.push({
+            name: "apikey",
+            required: true,
+            description: "Registered API Key"
+          });
         }
-        res.json({ creator: config.settings.creator, ...currentConfig });
-    } catch (error) {
-        res.status(500).json({ creator: config.settings.creator, error: 'Internal Server Error' });
+      });
     }
+
+    res.json({
+      creator: config.settings.creator,
+      ...currentConfig
+    });
+  } catch (error) {
+    res.status(500).json({
+      creator: config.settings.creator,
+      error: 'Internal Server Error'
+    });
+  }
 });
 
-app.get('/docs', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'docs.html')));
-app.get('/donasi', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'donasi.html')));
+app.post('/donasi', (req, res) => {
+  res.redirect('/donasi')
+});
+
+app.get('/docs', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'docs.html'));
+});
+
+app.get('/donasi', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'donasi.html'));
+});
 
 app.use((req, res) => {
-    if (req.accepts('html')) {
-        const p404 = [
-            path.join(process.cwd(), 'public', '404.html'),
-            path.join(__dirname, 'public', '404.html')
-        ];
-        for (const p of p404) {
-            if (fs.existsSync(p)) return res.status(404).sendFile(p);
-        }
+  if (req.accepts('html')) {
+    const possible404 = [
+      path.join(process.cwd(), 'public', '404.html'),
+      path.join(__dirname, 'public', '404.html')
+    ];
+    for (const p of possible404) {
+      if (fs.existsSync(p)) {
+        return res.status(404).sendFile(p);
+      }
     }
-    res.status(404).json({ status: false, creator: config.settings.creator, message: 'Route not found' });
+  }
+
+  res.status(404).json({
+    status: false,
+    creator: config.settings.creator,
+    message: 'Route not found'
+  });
 });
 
 initAutoLoad(app, config, configPath);
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log('\n🚀 Server jalan (Supabase + Rate Limiting Mode)!');
-    console.log('----------------------------------');
-    console.log('Server: http://localhost:3000/docs');
-    console.log('----------------------------------');
+  console.log('\n🚀 Server berhasil jalan (Supabase Database Mode)!');
+  console.log('----------------------------------');
+  console.log('RestApi: https://altoffx-myapi.vercel.app');
+  console.log('Server running on http://localhost:3000/docs');
+  try {
+    console.log(`QRIS Configured: ${isStaticQrisConfigured() ? 'Yes' : 'No'}`);
+  } catch(e) {
+    console.log('QRIS Configured: Unknown');
+  }
+  console.log('----------------------------------');
 });
