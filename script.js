@@ -69,6 +69,13 @@ for (const p of configNya) {
 if (!configPath) { console.error('[✗] Config not found'); process.exit(1); }
 let config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
+// ================================================================
+// API KEY MIDDLEWARE
+// Flow:
+// 1. Cek API key valid
+// 2. Cek rate limit per jam (TIDAK ubah api_keys)
+// 3. Allow/reject request
+// ================================================================
 const checkApiKey = async (req, res, next) => {
     if (!req.path.startsWith('/api/')) return next();
     if (req.path === '/api/create-payment') return next();
@@ -85,6 +92,7 @@ const checkApiKey = async (req, res, next) => {
     }
 
     try {
+        // Step 1: Validasi API key
         const keyData = await validateApiKey(userKey);
 
         if (!keyData) {
@@ -95,6 +103,8 @@ const checkApiKey = async (req, res, next) => {
             });
         }
 
+        // Step 2: Cek rate limit per jam
+        // (api_keys table TIDAK diubah sama sekali)
         const rateCheck = await checkRateLimit(userKey, keyData);
 
         if (!rateCheck.allowed) {
@@ -111,6 +121,7 @@ const checkApiKey = async (req, res, next) => {
             });
         }
 
+        // Step 3: Allow - attach info ke request (opsional, buat logging)
         req.apiKeyData = {
             role: keyData.service_name,
             rateLimit: rateCheck.limit,
@@ -238,6 +249,7 @@ app.get('/api/key-info', async (req, res) => {
         const isUnlimited = keyData.rate_per_hour === -1;
         const limitPerHour = keyData.rate_per_hour;
 
+        // Baca usage jam ini dari rate_limits
         const window = getCurrentWindow();
         const { data: rateData } = await supabase
             .from('rate_limits')
