@@ -134,7 +134,7 @@
         "name": "Facebook Downloader",
         "endpoint": "/api/download/facebook",
         "filename": "facebook",
-        "method": "Eror",
+        "method": "GET",
         "params": [
           {
             "name": "url",
