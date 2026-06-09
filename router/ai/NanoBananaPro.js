@@ -6,7 +6,6 @@ const API = "https://api.easemate.ai";
 const WASM_URL =
   "https://raw.githubusercontent.com/Ditzzx-vibecoder/Assets/main/chat_generator.wasm";
 
-const SESSION_FILE = "./easemate-image-edit-session.json";
 const MAX_USE_PER_DEVICE = 1;
 
 const ASPECT_RATIO = "Auto";
@@ -24,6 +23,7 @@ let wasm;
 let wasmUint8 = null;
 let wasmDataView = null;
 let wasmLastLen = 0;
+let cachedSession = null;
 
 const decoder = new TextDecoder("utf-8", { ignoreBOM: true, fatal: true });
 const encoder = new TextEncoder();
@@ -74,20 +74,19 @@ function createFreshSession() {
 }
 
 async function loadSession() {
-  try {
-    const raw = await fs.readFile(SESSION_FILE, "utf8");
-    const session = JSON.parse(raw);
-    if (!session.deviceId || typeof session.usedCount !== "number") return createFreshSession();
-    if (session.usedCount >= MAX_USE_PER_DEVICE) return createFreshSession();
-    if (!session.identityId) session.identityId = "";
-    return session;
-  } catch {
-    return createFreshSession();
+  if (cachedSession) {
+    if (cachedSession.usedCount >= MAX_USE_PER_DEVICE) {
+      cachedSession = null;
+    } else {
+      return cachedSession;
+    }
   }
+  cachedSession = createFreshSession();
+  return cachedSession;
 }
 
 async function saveSession(session) {
-  await fs.writeFile(SESSION_FILE, JSON.stringify(session, null, 2), "utf8");
+  cachedSession = session;
 }
 
 async function markSessionUsed(session, identityId) {
@@ -237,8 +236,7 @@ async function initWasm(session) {
   if (wasm) return;
   setupBrowserMock(session);
   const wasmBytes = await loadWasmBytes();
-  const imports = createImports();
-  const { instance } = await WebAssembly.instantiate(wasmBytes, imports);
+  const { instance } = await WebAssembly.instantiate(wasmBytes, createImports());
   wasm = instance.exports;
   wasmUint8 = null;
   wasmDataView = null;
@@ -351,16 +349,11 @@ module.exports = async function easemateHandler(req, res) {
   const prompt = req.query?.prompt || req.body?.prompt;
   const imagePath = req.query?.image || req.body?.image;
 
-  if (!prompt) {
-    return res.status(400).json({ status: false, message: "Parameter 'prompt' diperlukan." });
-  }
-  if (!imagePath) {
-    return res.status(400).json({ status: false, message: "Parameter 'image' diperlukan." });
-  }
+  if (!prompt) return res.status(400).json({ status: false, message: "Parameter 'prompt' diperlukan." });
+  if (!imagePath) return res.status(400).json({ status: false, message: "Parameter 'image' diperlukan." });
 
   try {
     const session = await loadSession();
-    await saveSession(session);
     await ensureIdentity(session);
 
     const uploadInfo = await queryUploadUrl(session, imagePath);
