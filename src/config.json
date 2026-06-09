@@ -52,10 +52,10 @@
         "name": "NanoBanana Pro",
         "endpoint": "/api/ai/nanobanana",
         "filename": "NanoBananaPro",
-        "method": "Eror",
+        "method": "POST",
         "params": [
           {
-            "name": "imagePath",
+            "name": "image",
             "required": true,
             "description": "Image Path or URL"
           },
