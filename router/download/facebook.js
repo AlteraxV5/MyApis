@@ -1,86 +1,56 @@
-const axios = require("axios")
-const cheerio = require("cheerio")
-const querystring = require("querystring")
+const axios = require("axios");
+
+const API = "https://api.rifkyshre.biz.id";
+const ROUTE = "/scrape/facebook";
 
 const headers = {
-  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-  "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-  "Origin": "https://fdownloader.net",
-  "Referer": "https://fdownloader.net/"
-}
+  "Content-Type": "application/json",
+  Origin: "https://code.rifkyshre.biz.id",
+  Referer: "https://code.rifkyshre.biz.id/",
+};
 
 module.exports = async function facebookHandler(req, res) {
-
-  const url = req.query?.url || req.body?.url
-
+  const url = req.query?.url || req.body?.url;
   if (!url) {
     return res.status(400).json({
       status: false,
-      message: "Parameter 'url' diperlukan."
-    })
+      message: "Parameter 'url' diperlukan.",
+    });
   }
 
   try {
-
-    const body = querystring.stringify({
-      q: url,
-      lang: "en",
-      web: "fdownloader.net",
-      v: "v2",
-      w: ""
-    })
-
     const response = await axios.post(
-      "https://v3.fdownloader.net/api/ajaxSearch",
-      body,
+      `${API}${ROUTE}`,
+      { url },
       {
         headers,
-        timeout: 15000
+        timeout: 30000,
+        validateStatus: () => true,
       }
-    )
+    );
 
-    if (!response.data || !response.data.data) {
-      throw new Error("Response tidak valid")
+    const body = response.data;
+
+    if (!body?.status) {
+      throw new Error(body?.error ?? "Unknown error");
     }
 
-    const $ = cheerio.load(response.data.data)
-
-    const thumbnail = $(".thumbnail img").attr("src") || null
-    const duration = $(".content p").first().text().trim() || null
-
-    const videos = []
-    $("a.download-link-fb").each((_, el) => {
-      const link = $(el).attr("href")
-      const quality = $(el).attr("title")?.replace("Download ", "") || ""
-
-      if (link) {
-        videos.push({
-          quality,
-          url: link
-        })
-      }
-    })
-
-    if (!videos.length) {
-      throw new Error("Video tidak ditemukan")
-    }
+    const d = body.data;
 
     res.json({
       status: true,
       result: {
-        thumbnail,
-        duration,
-        videos
-      }
-    })
-
+        title: d.title,
+        description: d.description,
+        thumbnail: d.thumbnail,
+        hd: d.hd,
+        sd: d.sd,
+      },
+    });
   } catch (error) {
-
     res.status(500).json({
       status: false,
-      message: error.message
-    })
-
+      message: error.message,
+    });
   }
-
-}
+};
