@@ -96,7 +96,7 @@
         "name": "Screenshot Web",
         "endpoint": "/api/tools/ssweb",
         "filename": "ssweb",
-        "method": "Eror",
+        "method": "GET",
         "params": [
           {
             "name": "url",
@@ -114,7 +114,7 @@
         "name": "Short URL",
         "endpoint": "/api/tools/shorturl",
         "filename": "shorturl",
-        "method": "Eror",
+        "method": "GET",
         "params": [
           {
             "name": "url",
