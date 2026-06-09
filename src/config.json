@@ -145,21 +145,22 @@
           "name": "alias",
           "required": false,
           "description": "Custom alias"
-        },
-        {
+        ]
+      },
+      {
       "name": "Carbonify",
       "endpoint": "/api/tools/carbon",
       "filename": "Carbon",
       "method": "GET",
-      "params": [
-        {
+      "params": [        
+      {
           "name": "code",
           "required": true,
           "description": "INPUT THE CODE"
-        }
-      ]
-    }
-  ],
+       }
+    ]
+  }
+],
     "download": [
       {
         "name": "Facebook Downloader",
