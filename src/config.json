@@ -286,7 +286,7 @@
         "name": "Instagram Stalk",
         "endpoint": "/api/stalk/ig",
         "filename": "igstalk",
-        "method": "Eror",
+        "method": "GET",
         "params": [
           {
             "name": "username",
