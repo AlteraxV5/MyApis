@@ -1,40 +1,50 @@
-const axios = require('axios');
+const axios = require("axios");
 
-module.exports = async function shortUrlHandler(req, res) {
-    const url = req.query?.url || req.body?.url;
-    const alias = (req.query?.alias || req.body?.alias) || '';
+const headers = {
+  Origin: "https://spoo.me",
+  Referer: "https://spoo.me/",
+  "User-Agent": "Mozilla/5.0 (Linux; Android 15; SM-F958 Build/AP3A.240905.015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6723.86 Mobile Safari/537.36",
+};
 
-    if (!url) {
-        return res.status(400).json({
-            status: false,
-            message: "Parameter 'url' diperlukan."
-        });
-    }
+module.exports = async function spoomeHandler(req, res) {
+  const url = req.query?.url || req.body?.url;
+  const alias = req.query?.alias || req.body?.alias || null;
 
-    if (!url.startsWith("http")) {
-        return res.status(400).json({
-            status: false,
-            message: "URL harus diawali dengan http:// atau https://"
-        });
-    }
+  if (!url) {
+    return res.status(400).json({
+      status: false,
+      message: "Parameter 'url' diperlukan.",
+    });
+  }
 
-    try {
-        const apiUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}&alias=${alias}`;
-        const response = await axios.get(apiUrl);
-        
-        if (response.data === "Error") {
-            throw new Error("Custom Alias ini sudah dipakai orang lain. Coba nama lain.");
-        }
-        
-        res.json({
-            status: true,
-            result: response.data
-        });
+  if (!url.startsWith("https://")) {
+    return res.status(400).json({
+      status: false,
+      message: "URL harus diawali dengan 'https://'.",
+    });
+  }
 
-    } catch (error) {
-        if (error.response && error.response.status === 400) {
-             return res.status(400).json({ status: false, message: "Alias tidak tersedia." });
-        }
-        res.status(500).json({ status: false, message: error.message });
-    }
+  try {
+    const response = await axios.post(
+      "https://spoo.me/api/v1/shorten",
+      {
+        ...(alias && { alias }),
+        long_url: url,
+      },
+      {
+        headers,
+        timeout: 15000,
+      }
+    );
+
+    res.json({
+      status: true,
+      result: response.data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: error.message,
+    });
+  }
 };
