@@ -9,8 +9,11 @@ module.exports = async function screenshotHandler(req, res) {
     });
   }
 
-  const width = parseInt(req.query?.width || req.body?.width) || 1920;
-  const height = parseInt(req.query?.height || req.body?.height) || 1080;
+  const type = req.query?.type || req.body?.type || "desktop";
+  const isMobile = type === "mobile";
+
+  const width = parseInt(req.query?.width || req.body?.width) || (isMobile ? 390 : 1920);
+  const height = parseInt(req.query?.height || req.body?.height) || (isMobile ? 844 : 1080);
   const waitFor = parseInt(req.query?.waitFor || req.body?.waitFor) || 3000;
   const fullPage = (req.query?.fullPage || req.body?.fullPage) === "true";
   const element = req.query?.element || req.body?.element || null;
@@ -24,6 +27,8 @@ module.exports = async function screenshotHandler(req, res) {
       viewport: {
         width,
         height,
+        isMobile,
+        deviceScaleFactor: isMobile ? 2 : 1,
       },
       waitFor,
       meta: false,
@@ -45,6 +50,9 @@ module.exports = async function screenshotHandler(req, res) {
       status: true,
       result: {
         url: resultUrl,
+        type,
+        width,
+        height,
       },
     });
   } catch (error) {
