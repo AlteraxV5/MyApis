@@ -91,44 +91,64 @@
         "params": []
       }
     ],
-    "tools": [
-      {
-        "name": "Screenshot Web",
-        "endpoint": "/api/tools/ssweb",
-        "filename": "ssweb",
-        "method": "GET",
-        "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Website URL"
-          },
-          {
-            "name": "type",
-            "required": false,
-            "description": "mobile | desktop"
-          }
-        ]
-      },
-      {
-        "name": "Short URL",
-        "endpoint": "/api/tools/shorturl",
-        "filename": "shorturl",
-        "method": "GET",
-        "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Original URL"
-          },
-          {
-            "name": "alias",
-            "required": false,
-            "description": "Custom Alias"
-          }
-        ]
-      }
-    ],
+  "tools": [
+    {
+      "name": "Screenshot Web",
+      "endpoint": "/api/tools/ssweb",
+      "filename": "ssweb",
+      "method": "GET",
+      "params": [
+        {
+          "name": "url",
+          "required": true,
+          "description": "Website URL"
+        },
+        {
+          "name": "width",
+          "required": false,
+          "description": "Viewport width (default: 1920)"
+        },
+        {
+          "name": "height",
+          "required": false,
+          "description": "Viewport height (default: 1080)"
+        },
+        {
+          "name": "waitFor",
+          "required": false,
+          "description": "Wait time in ms (default: 3000)"
+        },
+        {
+          "name": "fullPage",
+          "required": false,
+          "description": "Full page screenshot (default: false)"
+        },
+        {
+          "name": "element",
+          "required": false,
+          "description": "CSS selector to screenshot"
+        }
+      ]
+    },
+    {
+      "name": "Short URL",
+      "endpoint": "/api/tools/shorturl",
+      "filename": "shorturl",
+      "method": "GET",
+      "params": [
+        {
+          "name": "url",
+          "required": true,
+          "description": "Original URL (must start with https://)"
+        },
+        {
+          "name": "alias",
+          "required": false,
+          "description": "Custom alias"
+        }
+      ]
+    }
+  ],
     "download": [
       {
         "name": "Facebook Downloader",
