@@ -1,6 +1,6 @@
 {
   "name": "AltOffx",
-  "version": "3.5.0",
+  "version": "4.5.0",
   "description": "",
   "main": "script.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "jimp": "^0.22.10",
     "tough-cookie": "^4.1.3",
     "@supabase/supabase-js": "^2.50.0",
-    "@microlink/mql": "^3.0.0"
+    "@microlink/mql": "latest"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
