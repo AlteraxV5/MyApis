@@ -21,17 +21,17 @@
          {
            "name": "q",
            "required": true,
-           "description": "Question"
+           "description": "Question (Wajib)"
          },
          {
            "name": "customPrompt",
-           "required": false,
-           "description": "Custom system prompt"
+           "required": true,
+           "description": "Custom system prompt (Wajib)"
          },
          {
            "name": "session",
            "required": false,
-           "description": "Session ID"
+           "description": "Session ID (Opsinal)"
           }
         ]
       },
