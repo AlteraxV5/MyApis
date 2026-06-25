@@ -12,21 +12,26 @@
   },
   "tags": {
     "ai": [
-      {
-        "name": "AltOfficial Chat",
-        "endpoint": "/api/ai/altofficial",
-        "filename": "AltOfficial",
-        "method": "GET",
-        "params": [
-          {
-            "name": "q",
-            "required": true,
-            "description": "Question"
-          },
-          {
-            "name": "session",
-            "required": false,
-            "description": "Session ID"
+     {
+       "name": "AltOfficial Chat",
+       "endpoint": "/api/ai/chatCustom",
+       "filename": "CTP",
+       "method": "GET",
+       "params": [
+         {
+           "name": "q",
+           "required": true,
+           "description": "Question"
+         },
+         {
+           "name": "customPrompt",
+           "required": false,
+           "description": "Custom system prompt"
+         },
+         {
+           "name": "session",
+           "required": false,
+           "description": "Session ID"
           }
         ]
       },
