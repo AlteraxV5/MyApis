@@ -13,7 +13,7 @@
   "tags": {
     "ai": [
      {
-       "name": "AltOfficial Chat",
+       "name": "AI Chat Custom",
        "endpoint": "/api/ai/chatCustom",
        "filename": "CTP",
        "method": "GET",
