@@ -101,7 +101,7 @@
         "name": "Screenshot Web",
         "endpoint": "/api/tools/ssweb",
         "filename": "ssweb",
-        "method": "GET",
+        "method": "Eror",
         "params": [
           {
             "name": "url",
