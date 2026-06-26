@@ -154,6 +154,29 @@
         ]
       },
       {
+        "name": "SparkPix HD Upscale",
+        "endpoint": "/api/tools/upscale",
+        "filename": "upscale",
+        "method": "GET",
+        "params": [
+          { 
+            "name": "url",
+            "required": true, 
+            "description": "URL gambar yang mau di-upscale"
+          },
+          {
+            "name": "quality",
+            "required": false, 
+            "description": "4k / 6k / 8k (default: 4k)"
+          },
+          { 
+            "name": "face", 
+            "required": false, 
+            "description": "Face enhance true/false (default: false)"
+          }
+        ]
+      },
+      {
         "name": "Carbonify",
         "endpoint": "/api/tools/carbon",
         "filename": "Carbon",
@@ -274,6 +297,19 @@
             "name": "q",
             "required": true,
             "description": "Query"
+          }
+        ]
+      },
+      {
+        "name": "Telegram Sticker Pack",
+        "endpoint": "/api/tools/tgsticker",
+        "filename": "tgsticker",
+        "method": "GET",
+        "params": [
+          { 
+            "name": "url",
+            "required": true,
+            "description": "Telegram sticker pack URL (t.me/addstickers/...)" 
           }
         ]
       }
