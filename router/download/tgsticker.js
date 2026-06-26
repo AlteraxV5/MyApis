@@ -1,4 +1,5 @@
 const axios = require("axios");
+const sharp = require("sharp");
 
 const TOKEN = "8685426110:AAElxp42MGdsSrGTcpo7xnUAHa_YIdl_OVg" //Bot Token
 
@@ -31,17 +32,35 @@ class TelegramStickerPlugin {
     return `https://api.telegram.org/file/bot${this.token}/${data.result.file_path}`;
   }
 
-  async fetchStickerPack(url) {
+  async convertToWebp(url) {
+    try {
+      const { data } = await axios.get(url, { responseType: "arraybuffer" });
+      const buffer = Buffer.from(data);
+      const webp = await sharp(buffer).webp().toBuffer();
+      return `data:image/webp;base64,${webp.toString("base64")}`
+    } catch {
+      return url // fallback ke url asli kalau gagal convert
+    }
+  }
+
+  async fetchStickerPack(url, convertWebp = false) {
     const packName = this.extractPackName(url);
     const stickerSet = await this.getStickerSet(packName);
 
     const results = await Promise.all(
       stickerSet.stickers.map(async (sticker) => {
         const fileUrl = await this.getFileUrl(sticker.file_id);
+        const isAnimated = sticker.is_animated
+        
+        let finalUrl = fileUrl
+        if (convertWebp && !isAnimated) {
+          finalUrl = await this.convertToWebp(fileUrl)
+        }
+
         return {
           emoji: sticker.emoji,
-          type: sticker.is_animated ? "animated" : "static",
-          url: fileUrl,
+          type: isAnimated ? "animated" : "static",
+          url: finalUrl,
         };
       })
     );
@@ -57,12 +76,13 @@ class TelegramStickerPlugin {
 
 module.exports = async function (req, res) {
   const url = req.query?.url || req.body?.url
+  const convertWebp = req.query?.webp === 'true'
 
   if (!url) return res.status(400).json({ status: false, message: "Parameter 'url' diperlukan." })
 
   try {
     const plugin = new TelegramStickerPlugin(TOKEN)
-    const result = await plugin.fetchStickerPack(url)
+    const result = await plugin.fetchStickerPack(url, convertWebp)
 
     return res.json({
       status: true,
