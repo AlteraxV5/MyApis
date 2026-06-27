@@ -154,7 +154,7 @@
         ]
       },
       {
-        "name": "SparkPix HD Upscale",
+        "name": "HD Upscale",
         "endpoint": "/api/tools/upscale",
         "filename": "upscale",
         "method": "GET",
@@ -162,17 +162,7 @@
           { 
             "name": "url",
             "required": true, 
-            "description": "URL gambar yang mau di-upscale"
-          },
-          {
-            "name": "quality",
-            "required": false, 
-            "description": "4k / 6k / 8k (default: 4k)"
-          },
-          { 
-            "name": "face", 
-            "required": false, 
-            "description": "Face enhance true/false (default: false)"
+            "description": "URL gambar yang mau di HD kan"
           }
         ]
       },
