@@ -157,7 +157,7 @@
         "name": "SparkPix HD Upscale",
         "endpoint": "/api/tools/upscale",
         "filename": "upscale",
-        "method": "Eror",
+        "method": "GET",
         "params": [
           { 
             "name": "url",
