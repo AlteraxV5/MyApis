@@ -167,6 +167,19 @@
         ]
       },
       {
+        "name": "Remini HD Enhance",
+        "endpoint": "/api/tools/remini",
+        "filename": "remini",
+        "method": "GET",
+        "params": [
+          {
+            "name": "url",
+            "required": true, 
+            "description": "URL gambar yang mau di-enhance"
+          }
+        ]
+      },
+      {
         "name": "Carbonify",
         "endpoint": "/api/tools/carbon",
         "filename": "Carbon",
