@@ -36,6 +36,29 @@
         ]
       },
       {
+        "name": "Claude Haiku Chat",
+        "endpoint": "/api/ai/claude-haiku",
+        "filename": "Claude-Haiku",
+        "method": "GET",
+        "params": [
+          { 
+            "name": "q", 
+            "required": true,
+            "description": "Pertanyaan" 
+          },
+          {
+            "name": "customPrompt", 
+            "required": true, 
+            "description": "Custom system prompt" 
+          },
+          {
+            "name": "session", 
+            "required": false,
+            "description": "Session ID (Opsional)" 
+          }
+        ]
+      },
+      {
         "name": "WORM-GPT",
         "endpoint": "/api/ai/wormpgpt",
         "filename": "wormGPT",
