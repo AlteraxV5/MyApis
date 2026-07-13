@@ -12,27 +12,15 @@
   },
   "tags": {
     "ai": [
-     {
-       "name": "AI Chat Custom",
-       "endpoint": "/api/ai/chatCustom",
-       "filename": "CTP",
-       "method": "GET",
-       "params": [
-         {
-           "name": "q",
-           "required": true,
-           "description": "Question (Wajib)"
-         },
-         {
-           "name": "customPrompt",
-           "required": true,
-           "description": "Custom system prompt (Wajib)"
-         },
-         {
-           "name": "session",
-           "required": false,
-           "description": "Session ID (Opsinal)"
-          }
+      {
+        "name": "AI Chat Custom",
+        "endpoint": "/api/ai/chatCustom",
+        "filename": "CTP",
+        "method": "GET",
+        "params": [
+          { "name": "q", "required": true, "description": "Question (Wajib)" },
+          { "name": "customPrompt", "required": true, "description": "Custom system prompt (Wajib)" },
+          { "name": "session", "required": false, "description": "Session ID (Opsional)" }
         ]
       },
       {
@@ -41,21 +29,9 @@
         "filename": "Claude-Haiku",
         "method": "GET",
         "params": [
-          { 
-            "name": "q", 
-            "required": true,
-            "description": "Pertanyaan" 
-          },
-          {
-            "name": "customPrompt", 
-            "required": true, 
-            "description": "Custom system prompt" 
-          },
-          {
-            "name": "session", 
-            "required": false,
-            "description": "Session ID (Opsional)" 
-          }
+          { "name": "q", "required": true, "description": "Pertanyaan" },
+          { "name": "customPrompt", "required": false, "description": "Custom system prompt" },
+          { "name": "session", "required": false, "description": "Session ID (Opsional)" }
         ]
       },
       {
@@ -64,16 +40,8 @@
         "filename": "wormGPT",
         "method": "Eror",
         "params": [
-          {
-            "name": "message",
-            "required": true,
-            "description": "message"
-          },
-          {
-            "name": "session",
-            "required": false,
-            "description": "Session ID"
-          }
+          { "name": "message", "required": true, "description": "message" },
+          { "name": "session", "required": false, "description": "Session ID" }
         ]
       },
       {
@@ -82,16 +50,8 @@
         "filename": "NanoBananaPro",
         "method": "POST",
         "params": [
-          {
-            "name": "image",
-            "required": true,
-            "description": "Image Path or URL"
-          },
-          {
-            "name": "prompt",
-            "required": true,
-            "description": "Question / Prompt"
-          }
+          { "name": "image", "required": true, "description": "Image Path or URL" },
+          { "name": "prompt", "required": true, "description": "Question / Prompt" }
         ]
       }
     ],
@@ -102,11 +62,7 @@
         "filename": "brat",
         "method": "GET",
         "params": [
-          {
-            "name": "text",
-            "required": true,
-            "description": "Text"
-          }
+          { "name": "text", "required": true, "description": "Text" }
         ]
       }
     ],
@@ -126,36 +82,12 @@
         "filename": "ssweb",
         "method": "Eror",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Website URL"
-          },
-          {
-            "name": "width",
-            "required": false,
-            "description": "Viewport width (default: 1920)"
-          },
-          {
-            "name": "height",
-            "required": false,
-            "description": "Viewport height (default: 1080)"
-          },
-          {
-            "name": "waitFor",
-            "required": false,
-            "description": "Wait time in ms (default: 3000)"
-          },
-          {
-            "name": "fullPage",
-            "required": false,
-            "description": "Full page screenshot (default: false)"
-          },
-          {
-            "name": "element",
-            "required": false,
-            "description": "CSS selector to screenshot"
-          }
+          { "name": "url", "required": true, "description": "Website URL" },
+          { "name": "width", "required": false, "description": "Viewport width (default: 1920)" },
+          { "name": "height", "required": false, "description": "Viewport height (default: 1080)" },
+          { "name": "waitFor", "required": false, "description": "Wait time in ms (default: 3000)" },
+          { "name": "fullPage", "required": false, "description": "Full page screenshot (default: false)" },
+          { "name": "element", "required": false, "description": "CSS selector to screenshot" }
         ]
       },
       {
@@ -164,16 +96,8 @@
         "filename": "shorturl",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Original URL (must start with https://)"
-          },
-          {
-            "name": "alias",
-            "required": false,
-            "description": "Custom alias"
-          }
+          { "name": "url", "required": true, "description": "Original URL (must start with https://)" },
+          { "name": "alias", "required": false, "description": "Custom alias" }
         ]
       },
       {
@@ -182,11 +106,7 @@
         "filename": "upscale",
         "method": "GET",
         "params": [
-          { 
-            "name": "url",
-            "required": true, 
-            "description": "URL gambar yang mau di HD kan"
-          }
+          { "name": "url", "required": true, "description": "URL gambar yang mau di HD kan" }
         ]
       },
       {
@@ -195,11 +115,7 @@
         "filename": "remini",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true, 
-            "description": "URL gambar yang mau di-enhance"
-          }
+          { "name": "url", "required": true, "description": "URL gambar yang mau di-enhance" }
         ]
       },
       {
@@ -208,11 +124,7 @@
         "filename": "Carbon",
         "method": "GET",
         "params": [
-          {
-            "name": "code",
-            "required": true,
-            "description": "INPUT THE CODE"
-          }
+          { "name": "code", "required": true, "description": "INPUT THE CODE" }
         ]
       }
     ],
@@ -223,11 +135,7 @@
         "filename": "facebook",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Facebook URL"
-          }
+          { "name": "url", "required": true, "description": "Facebook URL" }
         ]
       },
       {
@@ -236,11 +144,7 @@
         "filename": "ytmp3",
         "method": "Eror",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Youtube URL"
-          }
+          { "name": "url", "required": true, "description": "Youtube URL" }
         ]
       },
       {
@@ -249,11 +153,7 @@
         "filename": "ytv2mp3",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Youtube URL"
-          }
+          { "name": "url", "required": true, "description": "Youtube URL" }
         ]
       },
       {
@@ -262,16 +162,8 @@
         "filename": "ytdlv2",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Youtube URL"
-          },
-          {
-            "name": "type",
-            "required": false,
-            "description": "mp3 | mp4"
-          }
+          { "name": "url", "required": true, "description": "Youtube URL" },
+          { "name": "type", "required": false, "description": "mp3 | mp4" }
         ]
       },
       {
@@ -280,11 +172,7 @@
         "filename": "Thdl",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Threads URL"
-          }
+          { "name": "url", "required": true, "description": "Threads URL" }
         ]
       },
       {
@@ -293,11 +181,16 @@
         "filename": "instagram",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "Instagram URL"
-          }
+          { "name": "url", "required": true, "description": "Instagram URL (reel/post/stories)" }
+        ]
+      },
+      {
+        "name": "Instagram Downloader V2",
+        "endpoint": "/api/download/igdlv2",
+        "filename": "IgV2",
+        "method": "GET",
+        "params": [
+          { "name": "url", "required": true, "description": "Instagram URL (reel/post)" }
         ]
       },
       {
@@ -306,11 +199,7 @@
         "filename": "tiktok",
         "method": "GET",
         "params": [
-          {
-            "name": "url",
-            "required": true,
-            "description": "TikTok URL"
-          }
+          { "name": "url", "required": true, "description": "TikTok URL" }
         ]
       },
       {
@@ -319,11 +208,7 @@
         "filename": "play",
         "method": "GET",
         "params": [
-          {
-            "name": "q",
-            "required": true,
-            "description": "Query"
-          }
+          { "name": "q", "required": true, "description": "Query" }
         ]
       },
       {
@@ -332,11 +217,7 @@
         "filename": "tgsticker",
         "method": "GET",
         "params": [
-          { 
-            "name": "url",
-            "required": true,
-            "description": "Telegram sticker pack URL (t.me/addstickers/...)" 
-          }
+          { "name": "url", "required": true, "description": "Telegram sticker pack URL (t.me/addstickers/...)" }
         ]
       }
     ],
@@ -347,11 +228,7 @@
         "filename": "yts",
         "method": "GET",
         "params": [
-          {
-            "name": "q",
-            "required": true,
-            "description": "Query"
-          }
+          { "name": "q", "required": true, "description": "Query" }
         ]
       },
       {
@@ -360,11 +237,7 @@
         "filename": "tiktok",
         "method": "GET",
         "params": [
-          {
-            "name": "q",
-            "required": true,
-            "description": "Query"
-          }
+          { "name": "q", "required": true, "description": "Query" }
         ]
       },
       {
@@ -373,11 +246,7 @@
         "filename": "pinterest",
         "method": "GET",
         "params": [
-          {
-            "name": "q",
-            "required": true,
-            "description": "Query"
-          }
+          { "name": "q", "required": true, "description": "Query" }
         ]
       }
     ],
@@ -388,11 +257,16 @@
         "filename": "igstalk",
         "method": "GET",
         "params": [
-          {
-            "name": "username",
-            "required": true,
-            "description": "Query"
-          }
+          { "name": "username", "required": true, "description": "Username Instagram" }
+        ]
+      },
+      {
+        "name": "Instagram Analyzer",
+        "endpoint": "/api/stalk/iganalyzer",
+        "filename": "iganalyzer",
+        "method": "GET",
+        "params": [
+          { "name": "username", "required": true, "description": "Username Instagram" }
         ]
       }
     ]
