@@ -67,8 +67,8 @@
       },
       {
         "name": "Brat Video Generator",
-        "endpoint": "/api/maker/bratvid",
-        "filename": "bratVideo",
+        "endpoint": "/api/maker/bratVid",
+        "filename": "bratVid",
         "method": "GET",
         "params": [
           { "name": "text", "required": true, "description": "Text untuk video" },
