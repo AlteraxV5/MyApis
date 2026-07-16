@@ -18,9 +18,9 @@
         "filename": "CTP",
         "method": "GET",
         "params": [
-          { "name": "q", "required": true, "description": "Question (Wajib)" },
-          { "name": "customPrompt", "required": true, "description": "Custom system prompt (Wajib)" },
-          { "name": "session", "required": false, "description": "Session ID (Opsional)" }
+          { "name": "q", "required": true, "description": "Question" },
+          { "name": "customPrompt", "required": true, "description": "Custom system prompt" },
+          { "name": "session", "required": false, "description": "Session ID" }
         ]
       },
       {
@@ -31,7 +31,7 @@
         "params": [
           { "name": "q", "required": true, "description": "Pertanyaan" },
           { "name": "customPrompt", "required": false, "description": "Custom system prompt" },
-          { "name": "session", "required": false, "description": "Session ID (Opsional)" }
+          { "name": "session", "required": false, "description": "Session ID" }
         ]
       },
       {
@@ -40,7 +40,7 @@
         "filename": "wormGPT",
         "method": "Eror",
         "params": [
-          { "name": "message", "required": true, "description": "message" },
+          { "name": "message", "required": true, "description": "Message" },
           { "name": "session", "required": false, "description": "Session ID" }
         ]
       },
@@ -64,6 +64,23 @@
         "params": [
           { "name": "text", "required": true, "description": "Text" }
         ]
+      },
+      {
+        "name": "Brat Video Generator",
+        "endpoint": "/api/maker/bratvid",
+        "filename": "bratVideo",
+        "method": "GET",
+        "params": [
+          { "name": "text", "required": true, "description": "Text untuk video" },
+          { "name": "theme", "required": false, "description": "black | white | green (default: white)" },
+          { "name": "blur", "required": false, "description": "0 | 1 | 2 | 3 (default: 0)" },
+          { "name": "format", "required": false, "description": "mp4 | gif (default: mp4)" },
+          { "name": "frameDuration", "required": false, "description": "Durasi tiap frame dalam detik (default: 0.35)" },
+          { "name": "holdDuration", "required": false, "description": "Durasi tahan frame terakhir (default: 1.2)" },
+          { "name": "maxWordPerLayer", "required": false, "description": "Kata per frame (default: 1)" },
+          { "name": "maxWordBeforeReset", "required": false, "description": "Reset layer setelah N kata (default: 0)" },
+          { "name": "fastProgress", "required": false, "description": "true | false - render lebih cepat (default: false)" }
+        ]
       }
     ],
     "random": [
@@ -83,6 +100,7 @@
         "method": "Eror",
         "params": [
           { "name": "url", "required": true, "description": "Website URL" },
+          { "name": "type", "required": false, "description": "mobile | desktop (default: desktop)" },
           { "name": "width", "required": false, "description": "Viewport width (default: 1920)" },
           { "name": "height", "required": false, "description": "Viewport height (default: 1080)" },
           { "name": "waitFor", "required": false, "description": "Wait time in ms (default: 3000)" },
@@ -124,7 +142,20 @@
         "filename": "Carbon",
         "method": "GET",
         "params": [
-          { "name": "code", "required": true, "description": "INPUT THE CODE" }
+          { "name": "code", "required": true, "description": "Input code" },
+          { "name": "language", "required": false, "description": "Language (default: javascript)" },
+          { "name": "theme", "required": false, "description": "dracula-pro | monokai | nord | one-dark (default: dracula-pro)" },
+          { "name": "font", "required": false, "description": "Fira Code | JetBrains Mono | Hack (default: Fira Code)" }
+        ]
+      },
+      {
+        "name": "Easemate Image Edit",
+        "endpoint": "/api/tools/easemate",
+        "filename": "easemate",
+        "method": "POST",
+        "params": [
+          { "name": "prompt", "required": true, "description": "Prompt edit gambar" },
+          { "name": "image", "required": true, "description": "Path file gambar (JPG/PNG)" }
         ]
       }
     ],
